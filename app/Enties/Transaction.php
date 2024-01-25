@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace App\Entity;
 
+use App\Entity\Category;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -43,5 +45,10 @@ class Transaction
 
 	#[OneToMany(mappedBy: 'transaction', targetEntity: Receipt::class)]
 	private Collection $receipts;
+
+	public function __construct()
+	{
+		$this->receipts = new ArrayCollection();
+	}
 
 }
