@@ -66,5 +66,5 @@ return [
         new EntrypointLookup(BUILD_PATH . '/entrypoints.json'),
         $container->get('webpack_encore.packages')
     ),
-    ResponseFactoryInterface::class => fn(App $app) => $app
+    ResponseFactoryInterface::class => fn(App $app) => $app->getResponseFactory(),
 ];
