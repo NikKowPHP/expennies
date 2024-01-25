@@ -1,4 +1,4 @@
-<?php 
+<?php
 declare(strict_types=1);
 namespace App\Entity;
 
@@ -13,13 +13,13 @@ use Doctrine\ORM\Mapping\Id;
 
 
 #[Entity, Table('receipts')]
-class Transaction
+class Receipt
 {
 
 	#[Id, Column(options: ['unsigned' => true]), GeneratedValue]
 	private int $id;
 
-	#[Column(name:'file_name')]
+	#[Column(name: 'file_name')]
 	private string $fileName;
 
 
@@ -27,7 +27,44 @@ class Transaction
 	private \DateTime $createdAt;
 
 
-	#[ManyToOne(inversedBy:'receipts')]
+	#[ManyToOne(inversedBy: 'receipts')]
 	private Transaction $transaction;
+
+	public function getId(): int
+	{
+		return $this->id;
+	}
+
+	public function getFileName(): string
+	{
+		return $this->fileName;
+	}
+
+	public function setFileName(string $fileName): void
+	{
+		$this->fileName = $fileName;
+	}
+
+	public function getCreatedAt(): \DateTime
+	{
+		return $this->createdAt;
+	}
+
+	public function setCreatedAt(\DateTime $createdAt): void
+	{
+		$this->createdAt = $createdAt;
+	}
+
+	public function getTransaction(): Transaction
+	{
+		return $this->transaction;
+	}
+
+	public function setTransaction(Transaction $transaction): Receipt
+	{
+		$transaction->addReceipt($this);
+		$this->transaction = $transaction;
+		return $this;
+	}
 
 }
