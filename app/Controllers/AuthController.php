@@ -51,7 +51,6 @@ class AuthController
 			throw new ValidationException($v->errors());
 
 		}
-		exit;
 		$user = new User();
 		$user->setName($data['name']);
 		$user->setEmail($data['email']);
