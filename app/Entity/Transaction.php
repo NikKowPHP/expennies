@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\Receipt;
 use App\Entity\Category;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -26,7 +27,7 @@ class Transaction
 	#[Column]
 	private string $description;
 
-	#[Column(name: 'amount', Type::Types::DECIMAL, precision: 13, scale: 3)]
+	#[Column(name: 'amount', type:Types::DECIMAL, precision: 13, scale: 3)]
 	private float $amount;
 
 	#[Column]
