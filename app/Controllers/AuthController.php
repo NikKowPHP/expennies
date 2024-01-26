@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Contracts\AuthInterface;
 use App\Entity\User;
 use App\Exception\ValidationException;
 use Slim\Views\Twig;
@@ -15,7 +16,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class AuthController
 {
-	public function __construct(private readonly Twig $twig, private readonly EntityManager $entityManager)
+	public function __construct(private readonly Twig $twig, private readonly EntityManager $entityManager, private readonly AuthInterface $auth)
 	{
 
 	}
@@ -38,14 +39,18 @@ class AuthController
 		$v->rule('required', ['name', 'email', 'password', 'confirmPassword']);
 		$v->rule('email', 'email');
 
-		$user = $this->entityManager->getRepository(User::class)->findOneBy(
-			['email' => $data['email']]
-		);
-		if (!$user || !password_verify($data['password'], $user->getPassword())) {
+		// $user = $this->entityManager->getRepository(User::class)->findOneBy(
+		// 	['email' => $data['email']]
+		// );
+		// if (!$user || !password_verify($data['password'], $user->getPassword())) {
+		// 	throw new ValidationException(['password' => 'You have entered an invalid username or password']);
+		// }
+		// session_regenerate_id();
+		// $_SESSION['user'] = $user->getId();
+
+		if (!$this->auth->attemptLogin($data)) {
 			throw new ValidationException(['password' => 'You have entered an invalid username or password']);
 		}
-		session_regenerate_id();
-		$_SESSION['user'] = $user->getId();
 
 		return $response->withHeader('Location', '/')->withStatus(302);
 	}
@@ -55,6 +60,9 @@ class AuthController
 
 	public function logOut(Request $request, Response $response): Response
 	{
+
+		$this->auth->logOut();
+
 		return $response->withHeader('Location', '/')->withStatus(302);
 	}
 
