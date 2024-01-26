@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Auth;
 use Slim\App;
 use App\Config;
-use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use function DI\create;
 use Doctrine\ORM\ORMSetup;
 use App\Enum\AppEnvironment;
+use Slim\Factory\AppFactory;
 use Doctrine\ORM\EntityManager;
+use App\Contracts\AuthInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Symfony\Component\Asset\Package;
 use Psr\Container\ContainerInterface;
@@ -17,8 +19,8 @@ use Symfony\Component\Asset\Packages;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
-use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 
+use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 use Symfony\WebpackEncoreBundle\Twig\EntryFilesTwigExtension;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 
@@ -67,4 +69,5 @@ return [
         $container->get('webpack_encore.packages')
     ),
     ResponseFactoryInterface::class => fn(App $app) => $app->getResponseFactory(),
+    AuthInterface::class => fn(ContainerInterface $container) => $container->get(Auth::class)
 ];
