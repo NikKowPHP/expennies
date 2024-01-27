@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Auth;
+use App\DataObjects\SessionConfig;
+use App\Enum\SameSite;
 use Slim\App;
 use App\Config;
 use Slim\Views\Twig;
@@ -13,12 +15,14 @@ use Slim\Factory\AppFactory;
 use Doctrine\ORM\EntityManager;
 use App\Contracts\AuthInterface;
 use Twig\Extra\Intl\IntlExtension;
+use App\Contracts\SessionInterface;
 use Symfony\Component\Asset\Package;
 use App\Services\UserProviderService;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Asset\Packages;
 use Psr\Http\Message\ResponseFactoryInterface;
 use App\Contracts\UserProviderServiceInterface;
+use App\Session;
 
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
@@ -74,5 +78,10 @@ return [
     AuthInterface::class => fn(ContainerInterface $container) => $container->get(Auth::class),
 
     UserProviderServiceInterface::class => fn(ContainerInterface $container) => $container->get(UserProviderService::class),
-
+    SessionInterface::class => fn(Config $config) => new Session(new SessionConfig(
+        $config->get('session.name', ''),
+        $config->get('session.secure', true),
+        $config->get('session.httponly', true),
+        SameSite::from($config->get('session.samesite', 'lax'))
+    )) ,
 ];
