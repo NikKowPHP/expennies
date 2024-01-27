@@ -24,12 +24,12 @@ class Session implements SessionInterface
 		session_set_cookie_params([
 			'secure' => $this->options->secure,
 			'httponly' => $this->options->httponly,
-			'samesite' => (string)$this->options->samesite->value,
+			'samesite' => (string) $this->options->samesite->value,
 		]);
-		if(!empty($this->options->name)) {
+		if (!empty($this->options->name)) {
 			session_name($this->options->name);
 		}
-		if(!session_start()) {
+		if (!session_start()) {
 			throw new SessionException('Unable to start the session');
 		}
 	}
@@ -40,6 +40,27 @@ class Session implements SessionInterface
 	public function isActive(): bool
 	{
 		return session_status() === PHP_SESSION_ACTIVE;
+	}
+	public function get(string $key, mixed $default): mixed
+	{
+		return $this->has($key) ? $_SESSION[$key] : $default;
+	}
+	public function has(string $key): bool
+	{
+		return array_key_exists($key, $_SESSION);
+	}
+	public function regenerate(): bool
+	{
+		return session_regenerate_id();
+	}
+	public function put(string $key, mixed $value): void
+	{
+		$_SESSION[$key] = $value;
+	}
+	public function forget(string $key): void
+	{
+		unset($_SESSION[$key]);
+
 	}
 
 
