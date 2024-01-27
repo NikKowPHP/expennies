@@ -41,7 +41,7 @@ class Session implements SessionInterface
 	{
 		return session_status() === PHP_SESSION_ACTIVE;
 	}
-	public function get(string $key, mixed $default): mixed
+	public function get(string $key, mixed $default = null): mixed
 	{
 		return $this->has($key) ? $_SESSION[$key] : $default;
 	}
