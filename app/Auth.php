@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace App;
 
 use App\Contracts\AuthInterface;
-use App\Contracts\SessionInterface;
 use App\Contracts\UserInterface;
+use App\Contracts\SessionInterface;
+use App\DataObjects\RegisterUserData;
 use App\Contracts\UserProviderServiceInterface;
 
 class Auth implements AuthInterface
@@ -38,10 +39,14 @@ class Auth implements AuthInterface
 		if (!$user || !$this->checkCredentials($user, $credentials)) {
 			return false;
 		}
+		return true;
+	}
+	public function logIn(UserInterface $user): void
+	{
 		$this->session->regenerate();
 		$this->session->put('user', $user->getId());
 		$this->user = $user;
-		return true;
+
 	}
 
 	public function checkCredentials(UserInterface $user, array $credentials): bool
@@ -55,6 +60,14 @@ class Auth implements AuthInterface
 		$this->session->regenerate();
 		$this->user = null;
 	}
+	public function register(RegisterUserData	$data): UserInterface
+	{
+		$user = $this->userProvider->createUser($data);
+		$this->logIn($user);
+		// TODO: AUTH USER
+		return $user;
+	}
+
 
 
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Contracts\AuthInterface;
+use App\DataObjects\RegisterUserData;
 use App\Entity\User;
 use App\Exception\ValidationException;
 use Slim\Views\Twig;
@@ -38,15 +39,6 @@ class AuthController
 		$v = new Validator($data);
 		$v->rule('required', ['name', 'email', 'password', 'confirmPassword']);
 		$v->rule('email', 'email');
-
-		// $user = $this->entityManager->getRepository(User::class)->findOneBy(
-		// 	['email' => $data['email']]
-		// );
-		// if (!$user || !password_verify($data['password'], $user->getPassword())) {
-		// 	throw new ValidationException(['password' => 'You have entered an invalid username or password']);
-		// }
-		// session_regenerate_id();
-		// $_SESSION['user'] = $user->getId();
 
 		if (!$this->auth->attemptLogin($data)) {
 			throw new ValidationException(['password' => 'You have entered an invalid username or password']);
@@ -86,6 +78,7 @@ class AuthController
 		if (!$v->validate()) {
 			throw new ValidationException($v->errors());
 		}
+		$this->auth->register(new RegisterUserData($data['name'], $data['email'], $data['password']));
 
 		$user = new User();
 		$user->setName($data['name']);
