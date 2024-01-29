@@ -17,6 +17,8 @@
 								</h2>
 								<form method="post" action="/login">
 									<div class="form-outline form-white mb-4">
+										{{ csrf.fields | raw }}
+
 										<input type="email" name="email" class="form-control form-control-lg {{errors.email ? 'is-invalid' : ''}}" placeholder="Email" value="{{old.email}}" required/>
 										<div class="invalid-feedback">
 											{{ errors.email | first }}
