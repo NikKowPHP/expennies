@@ -59,8 +59,8 @@
 						{% for category in categories %}
 							<tr>
 								<td>{{ category.name }}</td>
-								<td>{{ category.createdAt }}</td>
-								<td>{{ category.updatedAt }}</td>
+								<td>{{ category.createdAt | date('Y-m-d H:i:s') }}</td>
+								<td>{{ category.updatedAt | date('Y-m-d H:i:s') }}</td>
 								<td>
 									<div class="d-flex flex-">
 										<form action="/categories/{{ category.id }}" method="post">
