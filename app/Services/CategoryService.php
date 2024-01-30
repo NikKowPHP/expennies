@@ -27,8 +27,12 @@ class CategoryService
 	public function getAll(): array
 	{
 		return $this->entityManager->getRepository(Category::class)->findAll();
-
 	}
-
+	public function delete(int $id):void
+	{
+		$category = $this->entityManager->find(Category::class, $id);
+		$this->entityManager->remove($category);
+		$this->entityManager->flush();
+	}
 
 }
