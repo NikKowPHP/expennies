@@ -9,12 +9,11 @@ window.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", function (event) {
       const categoryId = event.currentTarget.getAttribute("data-id");
 
-			console.log(editCategoryModal)
       fetch(`/categories/${categoryId}`)
         .then((response) => response.json())
-        .then((response) =>
-          openEditCategoryModal(editCategoryModal, response)
-        );
+        .then((jsonData) => {
+          openEditCategoryModal(editCategoryModal, jsonData)
+        });
     });
   });
 
@@ -22,7 +21,6 @@ window.addEventListener("DOMContentLoaded", function () {
     .querySelector(".save-category-btn")
     .addEventListener("click", function (event) {
       const categoryId = event.currentTarget.getAttribute("data-id");
-
     });
 });
 
