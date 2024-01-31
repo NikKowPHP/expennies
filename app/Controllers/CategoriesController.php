@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\ResponseFormatter;
 use Slim\Views\Twig;
 use App\Services\CategoryService;
 use App\Contracts\RequestValidatorFactoryInterface;
@@ -13,7 +14,8 @@ use App\RequestValidators\CreateCategoryRequestValidator;
 
 class CategoriesController
 {
-	public function __construct(private readonly Twig $twig, private readonly RequestValidatorFactoryInterface $requestValidatorFactory, private readonly CategoryService $categoryService)
+	public function __construct(private readonly Twig $twig, private readonly RequestValidatorFactoryInterface $requestValidatorFactory, private readonly CategoryService $categoryService,
+	private readonly ResponseFormatter $responseFormatter)
 	{
 	}
 
@@ -51,8 +53,7 @@ class CategoriesController
 		}
 		$data = ['id' => $category->getId(), 'name' => $category->getName()];
 		$response = $response->withHeader('Content-Type', 'application/json');
-		$response->getBody()->write(json_encode($data));
 
-		return $response;
+		return $this->responseFormatter->asJson($response, $data);
 	}
 }
