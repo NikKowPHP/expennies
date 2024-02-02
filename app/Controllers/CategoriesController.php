@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\ResponseFormatter;
 use Slim\Views\Twig;
+use App\ResponseFormatter;
 use App\Services\CategoryService;
 use App\Contracts\RequestValidatorFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\RequestValidators\CreateCategoryRequestValidator;
+use App\RequestValidators\UpdateCategoryRequestValidator;
 
 class CategoriesController
 {
@@ -53,6 +54,21 @@ class CategoriesController
 		}
 		$data = ['id' => $category->getId(), 'name' => $category->getName()];
 		$response = $response->withHeader('Content-Type', 'application/json');
+
+		return $this->responseFormatter->asJson($response, $data);
+	}
+
+	public function update(Request $request, Response $response, array $args): Response
+	{
+		$data = $this->requestValidatorFactory->make(UpdateCategoryRequestValidator::class)->validate($request->getParsedBody());
+
+		$category = $this->categoryService->getById((int) $args['id']);
+
+
+		if(! $category) {
+			return $response->withStatus(404);
+		}
+		$data = ['status' => 'ok'];
 
 		return $this->responseFormatter->asJson($response, $data);
 	}
