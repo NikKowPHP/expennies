@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Auth;
+use App\Csrf;
 use Slim\App;
 use App\Config;
 use App\Session;
@@ -24,8 +25,8 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Asset\Packages;
 use Psr\Http\Message\ResponseFactoryInterface;
 use App\Contracts\UserProviderServiceInterface;
-use Symfony\Bridge\Twig\Extension\AssetExtension;
 
+use Symfony\Bridge\Twig\Extension\AssetExtension;
 use App\RequestValidators\RequestValidatorFactory;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
 use App\Contracts\RequestValidatorFactoryInterface;
@@ -81,13 +82,18 @@ return [
     AuthInterface::class => fn(ContainerInterface $container) => $container->get(Auth::class),
 
     UserProviderServiceInterface::class => fn(ContainerInterface $container) => $container->get(UserProviderService::class),
-    SessionInterface::class => fn(Config $config) => new Session(new SessionConfig(
-        $config->get('session.name', ''),
-        $config->get('session.flash_name', 'flash'),
-        $config->get('session.secure', true),
-        $config->get('session.httponly', true),
-        SameSite::from($config->get('session.samesite', 'lax'))
-    )) ,
-    RequestValidatorFactoryInterface::class=> fn(ContainerInterface $container) => $container->get(RequestValidatorFactory::class),
-    'csrf' => fn(ResponseFactoryInterface $responseFactory) => new Guard($responseFactory, persistentTokenMode: true),
+    SessionInterface::class => fn(Config $config) => new Session(
+        new SessionConfig(
+            $config->get('session.name', ''),
+            $config->get('session.flash_name', 'flash'),
+            $config->get('session.secure', true),
+            $config->get('session.httponly', true),
+            SameSite::from($config->get('session.samesite', 'lax'))
+        )
+    ),
+    RequestValidatorFactoryInterface::class => fn(ContainerInterface $container) => $container->get(RequestValidatorFactory::class),
+    'csrf' => fn(ResponseFactoryInterface $responseFactory, Csrf $csrf) => new Guard(
+        $responseFactory, 
+        persistentTokenMode: true, 
+        failureHandler: $csrf->failureHandler()),
 ];
