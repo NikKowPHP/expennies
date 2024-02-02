@@ -23,6 +23,7 @@ return function (App $app) {
     $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
     $app->add(ValidationExceptionMiddleware::class);
     $app->add(ValidationErrosMiddleware::class);
+    $app->addBodyParsingMiddleware();
     $app->add(OldFormMiddleware::class);
     $app->add(StartSessionsMiddleware::class);
 
