@@ -16,19 +16,17 @@ class CategoryService
 	public function create(string $name, User $user): Category
 	{
 		$category = new Category();
-		$category->setName($name);
+
 		$category->setUser($user);
 
-		$this->entityManager->persist($category);
-		$this->entityManager->flush();
+		return $this->update($category, $name);
 
-		return $category;
 	}
 	public function getAll(): array
 	{
 		return $this->entityManager->getRepository(Category::class)->findAll();
 	}
-	public function delete(int $id):void
+	public function delete(int $id): void
 	{
 		$category = $this->entityManager->find(Category::class, $id);
 		$this->entityManager->remove($category);
@@ -37,6 +35,16 @@ class CategoryService
 	public function getById(int $id): ?Category
 	{
 		return $this->entityManager->find(Category::class, $id);
+	}
+	public function update(Category $category, string $name): Category
+	{
+		$category->setName($name);
+
+		$this->entityManager->persist($category);
+		$this->entityManager->flush();
+
+		return $category;
+
 	}
 
 }
