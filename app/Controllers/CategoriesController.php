@@ -60,9 +60,9 @@ class CategoriesController
 
 	public function update(Request $request, Response $response, array $args): Response
 	{
-		$data = $this->requestValidatorFactory->make(UpdateCategoryRequestValidator::class)->validate($request->getParsedBody());
+		$data = $this->requestValidatorFactory->make(UpdateCategoryRequestValidator::class)->validate($args + $request->getParsedBody());
 
-		$category = $this->categoryService->getById((int) $args['id']);
+		$category = $this->categoryService->getById((int) $data['id']);
 
 
 		if(! $category) {
