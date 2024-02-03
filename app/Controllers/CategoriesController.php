@@ -68,7 +68,6 @@ class CategoriesController
 		if(! $category) {
 			return $response->withStatus(404);
 		}
-		$data = ['status' => 'ok'];
 
 		$this->categoryService->update($category, $data['name']);
 
