@@ -1,4 +1,5 @@
 import { Modal } from "bootstrap";
+import { post, get } from "./ajax";
 
 window.addEventListener("DOMContentLoaded", function () {
   const editCategoryModal = new Modal(
@@ -9,11 +10,9 @@ window.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", function (event) {
       const categoryId = event.currentTarget.getAttribute("data-id");
 
-      fetch(`/categories/${categoryId}`)
-        .then((response) => response.json())
-        .then((jsonData) => {
-          openEditCategoryModal(editCategoryModal, jsonData);
-        });
+      get(`/categories/${categoryId}`).then((jsonData) => {
+        openEditCategoryModal(editCategoryModal, jsonData);
+      });
     });
   });
 
@@ -22,19 +21,10 @@ window.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", function (event) {
       const categoryId = event.currentTarget.getAttribute("data-id");
 
-      fetch(`/categories/${categoryId}`, {
-        method: "POST",
-        body: JSON.stringify({
-          name: editCategoryModal._element.querySelector('input[name="name"]')
-            .value,
-          ...getCsrfFields()
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => console.log(response))
-        .then((responseText) => console.log(responseText));
+      post(`/categories/${categoryId}`, {
+        name: editCategoryModal._element.querySelector('input[name="name"]')
+          .value,
+      }).then((response) => console.log(response));
     });
 });
 
@@ -48,8 +38,8 @@ function getCsrfFields() {
 
   return {
     [csrfNameKey]: csrfName,
-    [csrfValueKey]: csrfValue
-  }
+    [csrfValueKey]: csrfValue,
+  };
 }
 
 function openEditCategoryModal(modal, { id, name }) {
