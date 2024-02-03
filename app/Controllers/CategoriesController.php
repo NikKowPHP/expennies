@@ -70,6 +70,8 @@ class CategoriesController
 		}
 		$data = ['status' => 'ok'];
 
-		return $this->responseFormatter->asJson($response, $data);
+		$this->categoryService->update($category, $data['name']);
+
+		return $response;
 	}
 }
