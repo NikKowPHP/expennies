@@ -1,4 +1,4 @@
-const ajax = (url, method = "get", data = {}) => {
+const ajax = (url, method = "get", data = {}, domElement = null) => {
   method = method.toLowerCase();
   let options = {
     method,
@@ -16,11 +16,33 @@ const ajax = (url, method = "get", data = {}) => {
     url += "?" + new URLSearchParams(data).toString();
   }
 
-  return fetch(url, options).then((response) => response.json());
+  return fetch(url, options).then((response) => {
+    if (!response.ok) {
+      if (response.status === 422) {
+        response.json().then((errors) => {
+          handleValidationErrors(errors, domElement);
+        });
+      }
+    }
+    return response;
+  });
 };
+function handleValidationErrors(errors, domElement) {
+  for (const name in errors) {
+    const element = domElement.querySelector(`input[name="${name}"]`);
+    element.classList.add("is-invalid");
 
-const get = (url, data) => ajax(url, 'get', data);
-const post = (url, data) => ajax(url, 'post', data);
+    for (const error of errors[name]) {
+      const errorDiv = document.createElement("div");
+      errorDiv.classList.add("invalid-feedback");
+      errorDiv.textContent = error;
+      element.parentNode.append(errorDiv);
+    }
+  }
+}
+
+const get = (url, data) => ajax(url, "get", data);
+const post = (url, data, domElement) => ajax(url, "post", data, domElement);
 
 function getCsrfFields() {
   const csrfNameField = document.querySelector("#csrfName");
@@ -36,8 +58,4 @@ function getCsrfFields() {
   };
 }
 
-export {
-	ajax,
-	get,
-	post,
-}
+export { ajax, get, post };
