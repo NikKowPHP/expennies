@@ -7,7 +7,7 @@ window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("editCategoryModal")
   );
 
-  const tableActionBtns = `
+  const renderTableActionBtns =(row) => `
         <div class="d-flex flex-">
           <button type="submit" class="btn btn-outline-primary delete-category-btn" data-id="${row.id}">
             <i class="bi bi-trash3-fill"></i>
@@ -27,7 +27,7 @@ window.addEventListener("DOMContentLoaded", function () {
       { data: "updatedAt" },
       {
         sortable: false,
-        data: (row) => tableActionBtns,
+        data: (row) => renderTableActionBtns(row),
       },
     ],
   });
