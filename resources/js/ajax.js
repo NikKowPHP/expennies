@@ -11,12 +11,20 @@ const ajax = (url, method = "get", data = {}, domElement = null) => {
   const csrfMethods = new Set(["post", "put", "delete", "patch"]);
 
   if (csrfMethods.has(method)) {
+    if (method !== "post") {
+      options.method = "post";
+      data = { ...data, _METHOD: method.toUpperCase() };
+    }
     options.body = JSON.stringify({ ...data, ...getCsrfFields() });
   } else if (method === "get") {
     url += "?" + new URLSearchParams(data).toString();
   }
 
   return fetch(url, options).then((response) => {
+    if (domElement) {
+      console.log(domElement);
+      clearValidationErrors(domElement);
+    }
     if (!response.ok) {
       if (response.status === 422) {
         response.json().then((errors) => {
@@ -41,6 +49,22 @@ function handleValidationErrors(errors, domElement) {
   }
 }
 
+function clearValidationErrors(domElement) {
+  const elements = domElement.querySelectorAll(".is-invalid");
+  console.log(elements);
+  if (elements.length > 0) {
+    elements.forEach((element) => {
+      element.classList.remove("is-invalid");
+      const parentElements =
+        element.parentNode.querySelectorAll(".invalid-feedback");
+      if (parentElements > 0) {
+        parentElements.foreach((element) => {
+          element.remove();
+        });
+      }
+    });
+  }
+}
 const get = (url, data) => ajax(url, "get", data);
 const post = (url, data, domElement) => ajax(url, "post", data, domElement);
 
