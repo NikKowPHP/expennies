@@ -87,7 +87,7 @@ class CategoriesController
 			(int) $params['length'],
 			$orderBy,
 			$orderDir,
-
+			$params['search']['value']
 		);
 
 
