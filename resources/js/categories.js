@@ -6,8 +6,11 @@ window.addEventListener("DOMContentLoaded", function () {
   const editCategoryModal = new Modal(
     document.getElementById("editCategoryModal")
   );
+  const createCategoryModal = new Modal(
+    document.getElementById("newCategoryModal")
+  );
 
-  const renderTableActionBtns =(row) => `
+  const renderTableActionBtns = (row) => `
         <div class="d-flex flex-">
           <button type="submit" class="btn btn-outline-primary delete-category-btn" data-id="${row.id}">
             <i class="bi bi-trash3-fill"></i>
@@ -54,6 +57,26 @@ window.addEventListener("DOMContentLoaded", function () {
           });
       }
     });
+
+
+  document
+    .querySelector("#createNewCategoryBtn")
+    .addEventListener("click", function (event) {
+      post(
+        `/categories`,
+        {
+          name: createCategoryModal._element.querySelector('input[name="name"]')
+            .value,
+        },
+        createCategoryModal._element
+      ).then((response) => {
+        if (response.ok) {
+          table.draw();
+          createCategoryModal.hide();
+        }
+      });
+    });
+
 
   document
     .querySelector(".save-category-btn")
