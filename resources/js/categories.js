@@ -1,5 +1,5 @@
 import { Modal } from "bootstrap";
-import { post, get } from "./ajax";
+import { post, get, del } from "./ajax";
 
 window.addEventListener("DOMContentLoaded", function () {
   const editCategoryModal = new Modal(
@@ -15,6 +15,14 @@ window.addEventListener("DOMContentLoaded", function () {
         .then((response) => {
           openEditCategoryModal(editCategoryModal, response);
         });
+    });
+  });
+
+  document.querySelectorAll(".delete-category-btn").forEach((button) => {
+    button.addEventListener("click", function (event) {
+      const categoryId = event.currentTarget.getAttribute("data-id");
+    if (confirm("are you sure you want to delete a category?"))
+      del(`/categories/${categoryId}`);
     });
   });
 
