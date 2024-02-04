@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Entity\Category;
 use Slim\Views\Twig;
 use App\ResponseFormatter;
 use App\Services\CategoryService;
@@ -15,9 +16,12 @@ use App\RequestValidators\UpdateCategoryRequestValidator;
 
 class CategoriesController
 {
-	public function __construct(private readonly Twig $twig, private readonly RequestValidatorFactoryInterface $requestValidatorFactory, private readonly CategoryService $categoryService,
-	private readonly ResponseFormatter $responseFormatter)
-	{
+	public function __construct(
+		private readonly Twig $twig,
+		private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
+		private readonly CategoryService $categoryService,
+		private readonly ResponseFormatter $responseFormatter
+	) {
 	}
 
 	public function index(Request $request, Response $response): Response
@@ -25,9 +29,6 @@ class CategoriesController
 		return $this->twig->render(
 			$response,
 			'categories/index.twig',
-			[
-				'categories' => $this->categoryService->getAll(),
-			]
 		);
 	}
 
@@ -49,7 +50,7 @@ class CategoriesController
 	public function get(Request $request, Response $response, array $args): Response
 	{
 		$category = $this->categoryService->getById((int) $args['id']);
-		if(! $category) {
+		if (!$category) {
 			return $response->withStatus(404);
 		}
 		$data = ['id' => $category->getId(), 'name' => $category->getName()];
@@ -65,12 +66,34 @@ class CategoriesController
 		$category = $this->categoryService->getById((int) $data['id']);
 
 
-		if(! $category) {
+		if (!$category) {
 			return $response->withStatus(404);
 		}
 
 		$this->categoryService->update($category, $data['name']);
 
 		return $response;
+	}
+	public function load(Request $request, Response $response): Response
+	{
+		$params = $request->getQueryParams();
+		$categories = array_map(function (Category $category) {
+			return [
+				'id' => $category->getId(),
+				'name' => $category->getName(),
+				'createdAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
+				'updatedAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
+			];
+		}, $this->categoryService->getAll());
+		$totalCategories = count($categories);
+		return $this->responseFormatter->asJson(
+			$response,
+			[
+				'data' => $categories,
+				'draw' => (int) $params['draw'],
+				'recordsTotal' => $totalCategories,
+				'recordsFiltered' => $totalCategories,
+			]
+		);
 	}
 }
