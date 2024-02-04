@@ -67,6 +67,7 @@ function clearValidationErrors(domElement) {
 }
 const get = (url, data) => ajax(url, "get", data);
 const post = (url, data, domElement) => ajax(url, "post", data, domElement);
+const del = (url, data) => ajax(url, "delete", data);
 
 function getCsrfFields() {
   const csrfNameField = document.querySelector("#csrfName");
@@ -82,4 +83,4 @@ function getCsrfFields() {
   };
 }
 
-export { ajax, get, post };
+export { ajax, get, post, del };
