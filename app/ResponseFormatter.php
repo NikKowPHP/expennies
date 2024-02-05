@@ -13,4 +13,16 @@ class ResponseFormatter
 		$response->getBody()->write(json_encode($data, $flags));
 		return $response;
 	}
+	public function asDataTable(ResponseInterface $response, array $data, int $draw, int $total)
+	{
+		return $this->asJson(
+			$response,
+			[
+				'data' => $data,
+				'draw' => $draw,
+				'recordsTotal' => $total,
+				'recordsFiltered' => $total,
+			]
+		);
+	}
 }
