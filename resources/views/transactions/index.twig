@@ -2,28 +2,31 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	{{ encore_entry_script_tags('categories') }}
+	{{ encore_entry_script_tags('transactions') }}
 {% endblock %}
 
-{% block title %}Categories
+{% block title %}Transactions
 {% endblock %}
 
 {% block content %}
-	<div class="categories container content-body">
+	<div class="transactions container content-body">
 		<div class="text-end mb-4">
-			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newCategoryModal">
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTransactionModal">
 				<i class="bi bi-plus-circle me-1"></i>
-				New Category
+				New Transaction
 			</button>
-			{% include "categories/create_category_modal.twig" %}
+			{% include "transactions/create_transaction_modal.twig" %}
 		</div>
 	</div>
-	{% include "categories/edit_category_modal.twig" %}
+	{% include "transactions/edit_transaction_modal.twig" %}
 	<div>
-		<table id="categoriesTable">
+		<table id="transactionsTable">
 			<thead>
 				<tr>
-					<th>Name</th>
+					<th>Description</th>
+					<th>Amount</th>
+					<th>Category</th>
+					<th>Date</th>
 					<th>Created At</th>
 					<th>Updated At</th>
 					<th>Actions</th>
