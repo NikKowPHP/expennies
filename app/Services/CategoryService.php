@@ -30,7 +30,7 @@ class CategoryService
 	}
 
 
-	
+
 	public function getPaginatedCategories(DataTableQueryParams $params): Paginator
 	{
 		$query = $this->entityManager->getRepository(Category::class)
@@ -41,8 +41,8 @@ class CategoryService
 		$orderBy = in_array($params->orderBy, ['name', 'createdAt', 'updatedAt']) ? $params->orderBy : 'updatedAt';
 		$orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
 
-		if(! empty($params->searchTerm)) {
-			$query->where('c.name LIKE :name')->setParameter('name', '%' . addcslashes($params->searchTerm, '%_'). '%');
+		if (!empty($params->searchTerm)) {
+			$query->where('c.name LIKE :name')->setParameter('name', '%' . addcslashes($params->searchTerm, '%_') . '%');
 		}
 
 
@@ -71,6 +71,13 @@ class CategoryService
 
 		return $category;
 
+	}
+	public function getCategoryNames(): array
+	{
+		return $this->entityManager->getRepository(Category::class)->createQueryBuilder('c')
+			->select('c.id', 'c.name')
+			->getQuery()
+			->getArrayResult();
 	}
 
 }
