@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Entity\Receipt;
 use App\Entity\Category;
+use App\Traits\HasTimestamps;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Table;
@@ -18,8 +20,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 
 #[Entity, Table('transactions')]
+#[HasLifecycleCallbacks]
 class Transaction
 {
+	use HasTimestamps;
 
 	#[Id, Column(options: ['unsigned' => true]), GeneratedValue]
 	private int $id;
@@ -32,12 +36,6 @@ class Transaction
 
 	#[Column]
 	private \DateTime $date;
-
-	#[Column(name: 'created_at')]
-	private \DateTime $createdAt;
-
-	#[Column(name: 'updated_at')]
-	private \DateTime $updatedAt;
 
 	#[ManyToOne(inversedBy: 'transactions')]
 	private User $user;
@@ -88,25 +86,6 @@ class Transaction
 		$this->date = $date;
 	}
 
-	public function getCreatedAt(): \DateTime
-	{
-		return $this->createdAt;
-	}
-
-	public function setCreatedAt(\DateTime $createdAt): void
-	{
-		$this->createdAt = $createdAt;
-	}
-
-	public function getUpdatedAt(): \DateTime
-	{
-		return $this->updatedAt;
-	}
-
-	public function setUpdatedAt(\DateTime $updatedAt): void
-	{
-		$this->updatedAt = $updatedAt;
-	}
 
 	public function getUser(): User
 	{
