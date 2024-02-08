@@ -3,31 +3,39 @@ import { post, get, del } from "./ajax";
 import DataTable from "datatables.net";
 
 window.addEventListener("DOMContentLoaded", function () {
-  const editCategoryModal = new Modal(
-    document.getElementById("editCategoryModal")
+  const newTransactionModal = new Modal(
+    document.getElementById("newTransactionModal")
   );
-  const createCategoryModal = new Modal(
-    document.getElementById("newCategoryModal")
+  const editTransactionModal = new Modal(
+    document.getElementById("editTransactionModal")
   );
 
   const renderTableActionBtns = (row) => `
         <div class="d-flex flex-">
-          <button type="submit" class="btn btn-outline-primary delete-category-btn" data-id="${row.id}">
+          <button type="submit" class="btn btn-outline-primary delete-transaction-btn" data-id="${row.id}">
             <i class="bi bi-trash3-fill"></i>
           </button>
-          <button class="ms-2 btn btn-outline-primary edit-category-btn" data-id="${row.id}">
+          <button class="ms-2 btn btn-outline-primary edit-transaction-btn" data-id="${row.id}">
             <i class="bi bi-pencil-fill"></i>
           </button>
         </div>
   `;
-  const table = new DataTable("#categoriesTable", {
+  const table = new DataTable("#transactionsTable", {
     serverSide: true,
-    ajax: "/categories/load",
+    ajax: "/transactions/load",
     orderMulti: false,
     columns: [
-      { data: "name" },
-      { data: "createdAt" },
-      { data: "updatedAt" },
+      { data: "description" },
+      {
+        data: (row) =>
+          new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            currencySign: "accounting",
+          }).format(row.amount),
+      },
+      { data: "category", sortable: false },
+      { data: "date" },
       {
         sortable: false,
         data: (row) => renderTableActionBtns(row),
@@ -36,21 +44,22 @@ window.addEventListener("DOMContentLoaded", function () {
   });
 
   document
-    .querySelector("#categoriesTable")
+    .querySelector("#transactionsTable")
     .addEventListener("click", function (event) {
-      const editBtn = event.target.closest(".edit-category-btn");
-      const deleteBtn = event.target.closest(".delete-category-btn");
+      const editBtn = event.target.closest(".edit-transaction-btn");
+      const deleteBtn = event.target.closest(".delete-transaction-btn");
       if (editBtn) {
-        const categoryId = editBtn.getAttribute("data-id");
-        get(`/categories/${categoryId}`)
+        const transactionId = editBtn.getAttribute("data-id");
+        get(`/transactions/${transactionId}`)
           .then((response) => response.json())
           .then((response) => {
-            openEditCategoryModal(editCategoryModal, response);
+            openEditTransactionModal(editTransactionModal, response);
           });
       } else {
-        const categoryId = deleteBtn.getAttribute("data-id");
-        if (confirm("are you sure you want to delete a category?"))
-          del(`/categories/${categoryId}`).then(() => {
+        const transactionId = deleteBtn.getAttribute("data-id");
+
+        if (confirm("are you sure you want to delete the transaction?"))
+          del(`/transactions/${transactionId}`).then((response) => {
             if (response.ok) {
               table.draw();
             }
@@ -58,53 +67,58 @@ window.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-
   document
-    .querySelector("#createNewCategoryBtn")
+    .querySelector(".create-transaction-btn")
     .addEventListener("click", function (event) {
       post(
-        `/categories`,
-        {
-          name: createCategoryModal._element.querySelector('input[name="name"]')
-            .value,
-        },
-        createCategoryModal._element
+        `/transaction/`,
+        getTransactionFormData(newTransactionModal),
+        newTransactionModal._element
       ).then((response) => {
         if (response.ok) {
           table.draw();
-          createCategoryModal.hide();
+          newTransactionModal.hide();
         }
       });
     });
 
-
   document
-    .querySelector(".save-category-btn")
+    .querySelector(".save-transaction-btn")
     .addEventListener("click", function (event) {
-      const categoryId = event.currentTarget.getAttribute("data-id");
+      const transactionId = event.currentTarget.getAttribute("data-id");
 
       post(
-        `/categories/${categoryId}`,
-        {
-          name: editCategoryModal._element.querySelector('input[name="name"]')
-            .value,
-        },
-        editCategoryModal._element
+        `/transactions/${transactionId}`,
+        getTransactionFormData(editTransactionModal),
+        editTransactionModal._element
       ).then((response) => {
         if (response.ok) {
           table.draw();
-          editCategoryModal.hide();
+          editTransactionModal.hide();
         }
       });
     });
+  function getTransactionFormData(modal) {
+    let data = {};
+    const fields = [
+      ...modal._element.getElementByTagName("input"),
+      ...modal._element.getElementByTagName("select"),
+    ];
 
-  function openEditCategoryModal(modal, { id, name }) {
-    const nameInput = modal._element.querySelector('input[name="name"]');
+    fields.forEach((select) => {
+      data[select.name] = select.value;
+    });
+    return data;
+  }
 
-    nameInput.value = name;
+  function openEditTransactionModal(modal, { id, ...data }) {
+    for (let name in data) {
+      const nameInput = modal._element.querySelector(`[name="${name}"]`);
+      nameInput.value = data[name];
+    }
 
     modal._element
-      .querySelector(".save-category-btn")
+      .querySelector(".save-transaction-btn")
       .setAttribute("data-id", id);
 
     modal.show();
