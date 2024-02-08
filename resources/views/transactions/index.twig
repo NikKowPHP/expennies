@@ -15,10 +15,12 @@
 				<i class="bi bi-plus-circle me-1"></i>
 				New Transaction
 			</button>
-			{% include "transactions/create_transaction_modal.twig" %}
 		</div>
 	</div>
-	{% include "transactions/edit_transaction_modal.twig" %}
+
+	{% include "transactions/transaction_modal.twig" with {modal: {title: 'Create Transaction', id: 'newTransactionModal', isEdit: false}} %}
+	{% include "transactions/transaction_modal.twig" with {modal: {title: 'Edit Transaction', id: 'editTransactionModal', isEdit: true}} %}
+
 	<div>
 		<table id="transactionsTable">
 			<thead>
