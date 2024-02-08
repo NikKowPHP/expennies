@@ -37,15 +37,15 @@ const ajax = (url, method = "get", data = {}, domElement = null) => {
 };
 function handleValidationErrors(errors, domElement) {
   for (const name in errors) {
-    const element = domElement.querySelector(`input[name="${name}"]`);
+    const element = domElement.querySelector(`[name="${name}"]`);
     element.classList.add("is-invalid");
 
     for (const error of errors[name]) {
       const errorDiv = document.createElement("div");
       errorDiv.classList.add("invalid-feedback");
-      errorDiv.textContent = error;
-      element.parentNode.append(errorDiv);
+      errorDiv.textContent = errors[name][0];
     }
+    element.parentNode.append(errorDiv);
   }
 }
 
