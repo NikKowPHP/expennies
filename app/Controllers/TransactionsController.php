@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Entity\Category;
-use App\Services\RequestService;
-use App\Services\TransactionService;
 use Slim\Views\Twig;
 use App\ResponseFormatter;
+use App\Entity\Transaction;
+use App\Services\RequestService;
+use App\Services\CategoryService;
+use App\DataObjects\TransactionData;
+use App\Services\TransactionService;
 use App\Contracts\RequestValidatorFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Response;
+use App\RequestValidators\TransactionRequestValidator;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use App\RequestValidators\CreateCategoryRequestValidator;
-use App\RequestValidators\UpdateCategoryRequestValidator;
 
 class TransactionsController
 {
@@ -21,6 +22,7 @@ class TransactionsController
 		private readonly Twig $twig,
 		private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
 		private readonly TransactionService $transactionService,
+		private readonly CategoryService $categoryService,
 		private readonly RequestService $requestService,
 		private readonly ResponseFormatter $responseFormatter
 	) {
@@ -31,14 +33,15 @@ class TransactionsController
 		return $this->twig->render(
 			$response,
 			'transactions/index.twig',
+			['categories' => $this->categoryService->getCategoryNames()]
 		);
 	}
 
 	public function store(Request $request, Response $response): Response
 	{
-		$data = $this->requestValidatorFactory->make(CreateCategoryRequestValidator::class)->validate($request->getParsedBody());
+		$data = $this->requestValidatorFactory->make(TransactionRequestValidator::class)->validate($request->getParsedBody());
 
-		$this->transactionService->create($data['name'], $request->getAttribute('user'));
+		$this->transactionService->create(new TransactionData($data['description'], $data['amount'], $data['date'], $data['category']), $request->getAttribute('user'));
 
 		return $response->withHeader('Location', '/categories')->withStatus(302);
 	}
@@ -51,28 +54,41 @@ class TransactionsController
 	}
 	public function get(Request $request, Response $response, array $args): Response
 	{
-		$category = $this->transactionService->getById((int) $args['id']);
-		if (!$category) {
+		$transaction = $this->transactionService->getById((int) $args['id']);
+		if (!$transaction) {
 			return $response->withStatus(404);
 		}
-		$data = ['id' => $category->getId(), 'name' => $category->getName()];
-		$response = $response->withHeader('Content-Type', 'application/json');
+		$data = [
+			'id' => $transaction->getId(), 
+			'description' => $transaction->getDescription(),
+			'amount' => $transaction->getAmount(),
+			'date' => $transaction->getDate()->format('Y-m-d\TH:i'),
+			'category' => $transaction->getCategory()->getId(),
+	];
 
 		return $this->responseFormatter->asJson($response, $data);
 	}
 
 	public function update(Request $request, Response $response, array $args): Response
 	{
-		$data = $this->requestValidatorFactory->make(UpdateCategoryRequestValidator::class)->validate($args + $request->getParsedBody());
+		$data = $this->requestValidatorFactory->make(TransactionRequestValidator::class)->validate($args + $request->getParsedBody());
 
-		$category = $this->transactionService->getById((int) $data['id']);
-
-
-		if (!$category) {
+		$id = $data['id'];
+		if(! $id || ! ($transaction = $this->transactionService->getById($id))) {
 			return $response->withStatus(404);
 		}
 
-		$this->transactionService->update($category, $data['name']);
+
+
+		$this->transactionService->update(
+			$transaction, 
+			new TransactionData(
+				$data['description'],
+				(float) $data['amount'],
+				new \DateTime($data['date']),
+				$data['category'],
+			)
+		);
 
 		return $response;
 	}
@@ -82,25 +98,26 @@ class TransactionsController
 		$params = $this->requestService->getDataTableQueryParameters($request);
 
 
-		$categories = $this->transactionService->getPaginatedCategories($params);
+		$transactions = $this->transactionService->getPaginatedTransactions($params);
 
 
 		$transformer =
-			function (Category $category) {
+			function (Transaction $transaction) {
 				return [
-					'id' => $category->getId(),
-					'name' => $category->getName(),
-					'createdAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
-					'updatedAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
+					'id' => $transaction->getId(),
+					'description' => $transaction->getDescription(),
+					'amount' => $transaction->getDescription(),
+					'date' => $transaction->getDate()->format('m/d/Y g:i A'),
+					'category' => $transaction->getCategory()->getName(),
 				];
 			};
 
-		$totalCategories = count($categories);
+		$totalTransactions = count($transactions);
 		return $this->responseFormatter->asDataTable(
 			$response,
-			array_map($transformer, (array) $categories->getIterator()),
+			array_map($transformer, (array) $transactions->getIterator()),
 			$params->draw,
-			$totalCategories,
+			$totalTransactions,
 		);
 	}
 }
