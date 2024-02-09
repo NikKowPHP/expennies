@@ -71,7 +71,7 @@ window.addEventListener("DOMContentLoaded", function () {
     .querySelector(".create-transaction-btn")
     .addEventListener("click", function (event) {
       post(
-        `/transaction/`,
+        `/transactions/`,
         getTransactionFormData(newTransactionModal),
         newTransactionModal._element
       ).then((response) => {
@@ -99,14 +99,15 @@ window.addEventListener("DOMContentLoaded", function () {
       });
     });
   function getTransactionFormData(modal) {
+    console.log(modal)
     let data = {};
     const fields = [
-      ...modal._element.getElementByTagName("input"),
-      ...modal._element.getElementByTagName("select"),
+      ...modal._element.getElementsByTagName("input"),
+      ...modal._element.getElementsByTagName("select"),
     ];
 
-    fields.forEach((select) => {
-      data[select.name] = select.value;
+    fields.forEach((field) => {
+      data[field.name] = field.value;
     });
     return data;
   }
