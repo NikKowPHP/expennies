@@ -58,7 +58,6 @@ window.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-
   document
     .querySelector("#createNewCategoryBtn")
     .addEventListener("click", function (event) {
@@ -76,7 +75,6 @@ window.addEventListener("DOMContentLoaded", function () {
         }
       });
     });
-
 
   document
     .querySelector(".save-category-btn")

@@ -51,7 +51,6 @@ function handleValidationErrors(errors, domElement) {
 
 function clearValidationErrors(domElement) {
   const elements = domElement.querySelectorAll(".is-invalid");
-  console.log(elements);
   if (elements.length > 0) {
     elements.forEach((element) => {
       element.classList.remove("is-invalid");
