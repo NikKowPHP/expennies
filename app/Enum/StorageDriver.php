@@ -6,5 +6,5 @@ namespace App\Enum;
 
 enum StorageDriver: string
 {
-	case Local;
+	case Local = 'Local';
 }
