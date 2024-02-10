@@ -15,7 +15,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use App\RequestValidators\CreateCategoryRequestValidator;
 use App\RequestValidators\UpdateCategoryRequestValidator;
 
-class CategoriesController
+class CategoryController
 {
 	public function __construct(
 		private readonly Twig $twig,
@@ -91,7 +91,7 @@ class CategoriesController
 					'id' => $category->getId(),
 					'name' => $category->getName(),
 					'createdAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
-					'updatedAt' => $category->getCreatedAt()->format('m/d/Y g:i A'),
+					'updatedAt' => $category->getUpdatedAt()->format('m/d/Y g:i A'),
 				];
 			};
 
