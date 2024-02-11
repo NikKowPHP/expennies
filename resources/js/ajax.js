@@ -52,8 +52,8 @@ function handleValidationErrors(errors, domElement) {
       const errorDiv = document.createElement("div");
       errorDiv.classList.add("invalid-feedback");
       errorDiv.textContent = errors[name][0];
+      element.parentNode.append(errorDiv);
     }
-    element.parentNode.append(errorDiv);
   }
 }
 
@@ -64,8 +64,8 @@ function clearValidationErrors(domElement) {
       element.classList.remove("is-invalid");
       const parentElements =
         element.parentNode.querySelectorAll(".invalid-feedback");
-      if (parentElements > 0) {
-        parentElements.foreach((element) => {
+      if (parentElements.length > 0) {
+        parentElements.forEach((element) => {
           element.remove();
         });
       }
