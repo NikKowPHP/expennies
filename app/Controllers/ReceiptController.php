@@ -1,131 +1,71 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Contracts\RequestValidatorFactoryInterface;
-use App\DataObjects\TransactionData;
-use App\Entity\Transaction;
-use App\RequestValidators\TransactionRequestValidator;
-use App\ResponseFormatter;
-use App\Services\CategoryService;
-use App\Services\RequestService;
-use App\Services\TransactionService;
-use DateTime;
+use App\Services\ReceiptService;
 use League\Flysystem\Filesystem;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use App\Services\TransactionService;
+use App\Contracts\RequestValidatorFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Views\Twig;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use App\RequestValidators\UploadReceiptRequestValidator;
 
-class ReceiptController 
+class ReceiptController
 {
     public function __construct(
-			private readonly Filesystem $filesystem,
-			
+        private readonly Filesystem $filesystem,
+        private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
+        private readonly ReceiptService $receiptService,
+        private readonly TransactionService $transactionService,
+
+
     ) {
     }
 
-    public function index(Request $request, Response $response): Response
+    public function store(Request $request, Response $response, array $args): Response
     {
-        return $this->twig->render(
-            $response,
-            'transactions/index.twig',
-            ['categories' => $this->categoryService->getCategoryNames()]
-        );
-    }
+        $file = $this->requestValidatorFactory->make(UploadReceiptRequestValidator::class)->validate($request->getUploadedFiles())['receipt'];
 
-    public function store(Request $request, Response $response): Response
-    {
-        $data = $this->requestValidatorFactory->make(TransactionRequestValidator::class)->validate(
-            $request->getParsedBody()
-        );
+        $filename = $file->getClientFilename();
 
-        $this->transactionService->create(
-            new TransactionData(
-                $data['description'],
-                (float) $data['amount'],
-                new DateTime($data['date']),
-                $data['category']
-            ),
-            $request->getAttribute('user')
-        );
+        $id = (int) $args['id'];
 
-        return $response;
-    }
-
-    public function delete(Request $request, Response $response, array $args): Response
-    {
-        $this->transactionService->delete((int) $args['id']);
-
-        return $response;
-    }
-
-    public function get(Request $request, Response $response, array $args): Response
-    {
-        $transaction = $this->transactionService->getById((int) $args['id']);
-
-        if (! $transaction) {
+        if (!$id || !($transaction = $this->transactionService->getById($id))) {
             return $response->withStatus(404);
         }
 
-        $data = [
-            'id'          => $transaction->getId(),
-            'description' => $transaction->getDescription(),
-            'amount'      => $transaction->getAmount(),
-            'date'        => $transaction->getDate()->format('Y-m-d\TH:i'),
-            'category'    => $transaction->getCategory()->getId(),
-        ];
+        $randomFilename = bin2hex(random_bytes(25));
 
-        return $this->responseFormatter->asJson($response, $data);
-    }
+        $this->filesystem->write('receipts/' . $randomFilename, $file->getStream()->getContents());
 
-    public function update(Request $request, Response $response, array $args): Response
-    {
-        $data = $this->requestValidatorFactory->make(TransactionRequestValidator::class)->validate(
-            $args + $request->getParsedBody()
-        );
+        $this->receiptService->create($transaction, $filename, $randomFilename);
 
-        $id = (int) $data['id'];
-
-        if (! $id || ! ($transaction = $this->transactionService->getById($id))) {
-            return $response->withStatus(404);
-        }
-
-        $this->transactionService->update(
-            $transaction,
-            new TransactionData(
-                $data['description'],
-                (float) $data['amount'],
-                new DateTime($data['date']),
-                $data['category']
-            )
-        );
 
         return $response;
+
     }
 
-    public function load(Request $request, Response $response): Response
-    {
-        $params       = $this->requestService->getDataTableQueryParameters($request);
-        $transactions = $this->transactionService->getPaginatedTransactions($params);
-        $transformer  = function (Transaction $transaction) {
-            return [
-                'id'          => $transaction->getId(),
-                'description' => $transaction->getDescription(),
-                'amount'      => $transaction->getAmount(),
-                'date'        => $transaction->getDate()->format('m/d/Y g:i A'),
-                'category'    => $transaction->getCategory()->getName(),
-            ];
-        };
+    // public function delete(Request $request, Response $response, array $args): Response
+    // {
+    //     $this->transactionService->delete((int) $args['id']);
 
-        $totalTransactions = count($transactions);
+    //     return $response;
+    // }
 
-        return $this->responseFormatter->asDataTable(
-            $response,
-            array_map($transformer, (array) $transactions->getIterator()),
-            $params->draw,
-            $totalTransactions
-        );
-    }
+    // public function get(Request $request, Response $response, array $args): Response
+    // {
+    //     return $response;
+    // }
+
+    // public function update(Request $request, Response $response, array $args): Response
+    // {
+    //     return $response;
+    // }
+
+    // public function load(Request $request, Response $response): Response
+    // {
+    //     return $response;
+    // }
 }
