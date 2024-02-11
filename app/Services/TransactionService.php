@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -34,14 +34,14 @@ class TransactionService
             ->setFirstResult($params->start)
             ->setMaxResults($params->length);
 
-        $orderBy  = in_array($params->orderBy, ['description', 'amount', 'date'])
+        $orderBy = in_array($params->orderBy, ['description', 'amount', 'date'])
             ? $params->orderBy
             : 'date';
         $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
 
-        if (! empty($params->searchTerm)) {
+        if (!empty($params->searchTerm)) {
             $query->where('t.description LIKE :description')
-                  ->setParameter('description', '%' . addcslashes($params->searchTerm, '%_') . '%');
+                ->setParameter('description', '%' . addcslashes($params->searchTerm, '%_') . '%');
         }
 
         $query->orderBy('t.' . $orderBy, $orderDir);

@@ -31,7 +31,6 @@ const ajax = (url, method = "get", data = {}, domElement = null) => {
 
   return fetch(url, options).then((response) => {
     if (domElement) {
-      console.log(domElement);
       clearValidationErrors(domElement);
     }
     if (!response.ok) {

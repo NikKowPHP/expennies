@@ -119,7 +119,6 @@ window.addEventListener("DOMContentLoaded", function () {
     .querySelector(".upload-receipt-btn")
     .addEventListener("click", function (event) {
 
-      console.log(event.currentTarget);
       const transactionId = event.currentTarget.getAttribute("data-id");
 
       const formData = new FormData();
@@ -134,7 +133,8 @@ window.addEventListener("DOMContentLoaded", function () {
         `/transactions/${transactionId}/receipts`,
         formData,
         uploadReceiptModal._element
-      ).then((response) => {
+      ).then(response => response.json())
+      .then((response) => {
         if (response.ok) {
           table.draw();
           uploadReceiptModal.hide();
