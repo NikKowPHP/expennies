@@ -25,6 +25,8 @@ class Receipt
 	#[Column(name: 'storage_filename')]
 	private string $storageFilename;
 
+	#[Column(name: 'media_type')]
+	private string $mediaType;
 
 	#[Column(name: 'created_at')]
 	private \DateTime $createdAt;
@@ -66,6 +68,16 @@ class Receipt
 	public function setCreatedAt(\DateTime $createdAt): void
 	{
 		$this->createdAt = $createdAt;
+	}
+	public function getMediaType():string 
+	{
+		return $this->mediaType;
+	}
+
+	public function setMediaType(string $mediaType):Receipt 
+	{
+		$this->mediaType= $mediaType;
+		return $this;
 	}
 
 	public function getTransaction(): Transaction
