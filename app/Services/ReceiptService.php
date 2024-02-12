@@ -18,13 +18,14 @@ class ReceiptService
     {
     }
 
-    public function create($transaction, string $filename, string $storageFilename):Receipt 
+    public function create($transaction, string $filename, string $storageFilename, string $mediaType):Receipt 
     {
 			$receipt = new Receipt();
 			$receipt->setTransaction($transaction);
 			$receipt->setFilename($filename);
 			$receipt->setStorageFilename($storageFilename);
 			$receipt->setCreatedAt(new \DateTime());
+			$receipt->setMediaType($mediaType);
 
 			$this->entityManager->persist($receipt);
 			$this->entityManager->flush();
@@ -32,37 +33,9 @@ class ReceiptService
 			return $receipt;
     }
 
-    // public function getPaginatedTransactions(DataTableQueryParams $params): Paginator
-    // {
-    //     $query = $this->entityManager
-    //         ->getRepository(Transaction::class)
-    //         ->createQueryBuilder('t')
-    //         ->setFirstResult($params->start)
-    //         ->setMaxResults($params->length);
+    public function getById(int $id)
+    {
+        return $this->entityManager->find(Receipt::class, $id);
+    }
 
-    //     $orderBy = in_array($params->orderBy, ['description', 'amount', 'date'])
-    //         ? $params->orderBy
-    //         : 'date';
-    //     $orderDir = strtolower($params->orderDir) === 'asc' ? 'asc' : 'desc';
-
-    //     if (!empty($params->searchTerm)) {
-    //         $query->where('t.description LIKE :description')
-    //             ->setParameter('description', '%' . addcslashes($params->searchTerm, '%_') . '%');
-    //     }
-
-    //     $query->orderBy('t.' . $orderBy, $orderDir);
-
-    //     return new Paginator($query);
-    // }
-
-    // public function delete(int $id): void
-    // {
-    // }
-
-
-    // public function update(Transaction $transaction, TransactionData $transactionData): Transaction
-    // {
-
-    //     return $transaction;
-    // }
 }
