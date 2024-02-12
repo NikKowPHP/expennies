@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use Slim\Psr7\Stream;
 use App\Services\ReceiptService;
 use League\Flysystem\Filesystem;
 use App\Services\TransactionService;
@@ -40,32 +41,38 @@ class ReceiptController
 
         $this->filesystem->write('receipts/' . $randomFilename, $file->getStream()->getContents());
 
-        $this->receiptService->create($transaction, $filename, $randomFilename);
+        $this->receiptService->create($transaction, $filename, $randomFilename , $file->getClientMediaType());
 
 
         return $response;
 
     }
 
-    // public function delete(Request $request, Response $response, array $args): Response
-    // {
-    //     $this->transactionService->delete((int) $args['id']);
+    public function download(Request $request, Response $response, array $args): Response
+    {
+        $transactionId = (int)$args['transactionId'];
+        $receiptId = (int) $args['id'];
+        if (!$transactionId || !$this->transactionService->getById($transactionId)) {
+            return $response->withStatus(404);
+        }
+        if (!$receiptId || !$receipt = $this->receiptService->getById($receiptId)) {
+            return $response->withStatus(404);
+        }
 
-    //     return $response;
-    // }
+        if ($receipt->getTransaction()->getId() !== $transactionId) {
+            return $response->withStatus(401);
+        }
 
-    // public function get(Request $request, Response $response, array $args): Response
-    // {
-    //     return $response;
-    // }
+        $file = $this->filesystem->readStream('receipts/'. $receipt->getStorageFilename());
+        $response = $response->withHeader(
+            'Content-Disposition',
+            'inline; filename="'. $receipt->getFilename() . '"'
+        )->withHeader('Content-Type', $receipt->getMediaType());
+        return $response->withBody(new Stream($file));
 
-    // public function update(Request $request, Response $response, array $args): Response
-    // {
-    //     return $response;
-    // }
-
-    // public function load(Request $request, Response $response): Response
-    // {
-    //     return $response;
-    // }
+    }
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        return $response;
+    }
 }
