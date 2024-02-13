@@ -73,6 +73,8 @@ class ReceiptController
     }
     public function delete(Request $request, Response $response, array $args): Response
     {
+
+        $this->receiptService->delete((int) $args['id']);
         return $response;
     }
 }
