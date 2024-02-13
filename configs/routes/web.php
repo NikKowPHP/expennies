@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Controllers\ImportTransactionsController;
 use App\Controllers\ReceiptController;
 use Slim\App;
 use App\Middleware\AuthMiddleware;
@@ -40,6 +41,7 @@ return function (App $app) {
         $transactions->post('/{id:[0-9]+}', [TransactionController::class, 'update']);
         $transactions->post('/{id:[0-9]+}/receipts', [ReceiptController::class, 'store']);
         $transactions->get('/{transactionId:[0-9]+}/receipts/{id:[0-9]+}', [ReceiptController::class, 'download']);
+        $transactions->post('/import', [ImportTransactionsController::class, 'import']);
         $transactions->delete('/{transactionId:[0-9]+}/receipts/{id:[0-9]+}', [ReceiptController::class, 'delete']);
 
     })->add(AuthMiddleware::class);
