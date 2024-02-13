@@ -12,6 +12,9 @@ window.addEventListener("DOMContentLoaded", function () {
   const uploadReceiptModal = new Modal(
     document.getElementById("uploadReceiptModal")
   );
+  const importTransactionsModal = new Modal(
+    document.getElementById("importTransactionsModal")
+  );
 
   const table = new DataTable("#transactionsTable", {
     serverSide: true,
@@ -106,10 +109,9 @@ window.addEventListener("DOMContentLoaded", function () {
       if (editBtn) {
         const transactionId = editBtn.getAttribute("data-id");
 
-        get(`/transactions/${transactionId}`)
-          .then((response) =>
-            openEditTransactionModal(editTransactionModal, response)
-          );
+        get(`/transactions/${transactionId}`).then((response) =>
+          openEditTransactionModal(editTransactionModal, response)
+        );
       } else if (deleteBtn) {
         const transactionId = deleteBtn.getAttribute("data-id");
 
@@ -199,6 +201,28 @@ window.addEventListener("DOMContentLoaded", function () {
           if (response.ok) {
             table.draw();
             uploadReceiptModal.hide();
+          }
+        });
+    });
+  document
+    .querySelector(".import-transactions-btn")
+    .addEventListener("click", function (event) {
+      // const transactionId = event.currentTarget.getAttribute("data-id");
+
+      const formData = new FormData();
+      const files =
+        importTransactionsModal._element.querySelector('input[type="file"]').files;
+
+      for (let i = 0; i < files.length; i++) {
+        formData.append("importFile", files[i]);
+      }
+
+      post("/transactions/import", formData, importTransactionsModal._element)
+        // .then((response) => response.json())
+        .then((response) => {
+          if (response.ok) {
+            table.draw();
+            importTransactionsModal.hide();
           }
         });
     });
