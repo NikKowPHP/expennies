@@ -62,6 +62,15 @@ class CategoryService
 	{
 		return $this->entityManager->find(Category::class, $id);
 	}
+	public function getByName(string $name): ?Category
+	{
+		return $this->entityManager->getRepository(Category::class)
+			->createQueryBuilder('c')
+			->andWhere('c.name = :name')
+			->setParameter('name', $name)
+			->getQuery()
+			->getOneOrNullResult();
+	}
 	public function update(Category $category, string $name): Category
 	{
 		$category->setName($name);
@@ -74,10 +83,10 @@ class CategoryService
 	}
 	public function getCategoryNames(): array
 	{
-			return $this->entityManager->getRepository(Category::class)->createQueryBuilder('c')
-					->select('c.id', 'c.name')
-					->getQuery()
-					->getArrayResult();
+		return $this->entityManager->getRepository(Category::class)->createQueryBuilder('c')
+			->select('c.id', 'c.name')
+			->getQuery()
+			->getArrayResult();
 	}
 
 }
