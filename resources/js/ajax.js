@@ -13,8 +13,8 @@ const ajax = (url, method = "get", data = {}, domElement = null) => {
   if (csrfMethods.has(method)) {
     let additionalFields = { ...getCsrfFields() };
     if (method !== "post") {
-      options.method = "post";
       additionalFields._METHOD = method.toUpperCase();
+      options.method = method.toUpperCase();
     }
     if (data instanceof FormData) {
       for (const additionalField in additionalFields) {
@@ -28,6 +28,7 @@ const ajax = (url, method = "get", data = {}, domElement = null) => {
   } else if (method === "get") {
     url += "?" + new URLSearchParams(data).toString();
   }
+  console.log(options)
 
   return fetch(url, options).then((response) => {
     if (domElement) {
