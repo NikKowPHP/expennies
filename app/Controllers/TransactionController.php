@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Controllers;
 
@@ -69,16 +69,16 @@ class TransactionController
     {
         $transaction = $this->transactionService->getById((int) $args['id']);
 
-        if (! $transaction) {
+        if (!$transaction) {
             return $response->withStatus(404);
         }
 
         $data = [
-            'id'          => $transaction->getId(),
+            'id' => $transaction->getId(),
             'description' => $transaction->getDescription(),
-            'amount'      => $transaction->getAmount(),
-            'date'        => $transaction->getDate()->format('Y-m-d\TH:i'),
-            'category'    => $transaction->getCategory()->getId(),
+            'amount' => $transaction->getAmount(),
+            'date' => $transaction->getDate()->format('Y-m-d\TH:i'),
+            'category' => $transaction->getCategory()->getId(),
         ];
 
         return $this->responseFormatter->asJson($response, $data);
@@ -92,7 +92,7 @@ class TransactionController
 
         $id = (int) $data['id'];
 
-        if (! $id || ! ($transaction = $this->transactionService->getById($id))) {
+        if (!$id || !($transaction = $this->transactionService->getById($id))) {
             return $response->withStatus(404);
         }
 
@@ -111,16 +111,16 @@ class TransactionController
 
     public function load(Request $request, Response $response): Response
     {
-        $params       = $this->requestService->getDataTableQueryParameters($request);
+        $params = $this->requestService->getDataTableQueryParameters($request);
         $transactions = $this->transactionService->getPaginatedTransactions($params);
-        $transformer  = function (Transaction $transaction) {
+        $transformer = function (Transaction $transaction) {
             return [
-                'id'          => $transaction->getId(),
+                'id' => $transaction->getId(),
                 'description' => $transaction->getDescription(),
-                'amount'      => $transaction->getAmount(),
-                'date'        => $transaction->getDate()->format('m/d/Y g:i A'),
-                'category'    => $transaction->getCategory()->getName(),
-                'receipts'    => $transaction->getReceipts()->map(fn(Receipt $receipt) => [
+                'amount' => $transaction->getAmount(),
+                'date' => $transaction->getDate()->format('m/d/Y g:i A'),
+                'category' => $transaction->getCategory()->getName(),
+                'receipts' => $transaction->getReceipts()->map(fn(Receipt $receipt) => [
                     'name' => $receipt->getFilename(),
                     'id' => $receipt->getId(),
                 ])->toArray(),
