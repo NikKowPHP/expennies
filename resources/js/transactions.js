@@ -60,6 +60,8 @@ window.addEventListener("DOMContentLoaded", function () {
               "text-danger",
               "position-absolute"
             );
+            deleteIcon.style.left = "10px";
+            deleteIcon.style.bottom = "12px";
 
             anchor.href = `/transactions/${row.id}/receipts/${receipt.id}`;
             anchor.target = "blank";
@@ -132,15 +134,14 @@ window.addEventListener("DOMContentLoaded", function () {
         const receiptId = deleteReceiptBtn.getAttribute("data-id");
         const transactionId =
           deleteReceiptBtn.getAttribute("data-transactionid");
+        const url = `/transactions/${transactionId}/receipts/${receiptId}`;
 
         if (confirm("Are you sure you want to delete this receipt?")) {
-          del(`/transactions/${transactionId}/receipts/${receiptId}`).then(
-            (response) => {
-              if (response.ok) {
-                table.draw();
-              }
+          del(url).then((response) => {
+            if (response.ok) {
+              table.draw();
             }
-          );
+          });
         }
       }
     });
@@ -196,7 +197,7 @@ window.addEventListener("DOMContentLoaded", function () {
         formData,
         uploadReceiptModal._element
       )
-        // .then((response) => response.json())
+        .then((response) => response.json())
         .then((response) => {
           if (response.ok) {
             table.draw();
@@ -207,18 +208,18 @@ window.addEventListener("DOMContentLoaded", function () {
   document
     .querySelector(".import-transactions-btn")
     .addEventListener("click", function (event) {
-      // const transactionId = event.currentTarget.getAttribute("data-id");
 
       const formData = new FormData();
       const files =
-        importTransactionsModal._element.querySelector('input[type="file"]').files;
+        importTransactionsModal._element.querySelector(
+          'input[type="file"]'
+        ).files;
 
       for (let i = 0; i < files.length; i++) {
         formData.append("importFile", files[i]);
       }
 
       post("/transactions/import", formData, importTransactionsModal._element)
-        // .then((response) => response.json())
         .then((response) => {
           if (response.ok) {
             table.draw();
