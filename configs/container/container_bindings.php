@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use App\Auth;
 use App\Csrf;
+use Clockwork\Clockwork;
+use Clockwork\DataSource\DoctrineDataSource;
+use Clockwork\Storage\FileStorage;
 use Slim\App;
 use App\Config;
 use App\Session;
@@ -51,6 +54,7 @@ return [
         return $app;
     },
     Config::class => create(Config::class)->constructor(require CONFIG_PATH . '/app.php'),
+
     EntityManager::class => fn(Config $config) => EntityManager::create(
         $config->get('doctrine.connection'),
         ORMSetup::createAttributeMetadataConfiguration(
@@ -106,4 +110,10 @@ return [
         };
         return new League\Flysystem\Filesystem($adapter);
     },
+    Clockwork::class => function(EntityManager $entityManager) {
+        $clockwork = new Clockwork();
+        $clockwork->storage(new FileStorage(STORAGE_PATH . '/clockwork'));
+        $clockwork->addDataSource(new DoctrineDataSource($entityManager));
+        return $clockwork;
+    }
 ];
