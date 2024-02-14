@@ -197,7 +197,7 @@ window.addEventListener("DOMContentLoaded", function () {
         formData,
         uploadReceiptModal._element
       )
-        .then((response) => response.json())
+        // .then((response) => response.json())
         .then((response) => {
           if (response.ok) {
             table.draw();

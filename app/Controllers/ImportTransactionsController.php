@@ -30,12 +30,15 @@ class ImportTransactionsController
 		$user = $request->getAttribute('user');
 		$resource = fopen($file->getStream()->getMetadata('uri'), 'r');
 
+		$categories = $this->categoryService->getAllKeyedByName();
+
+
 		fgetcsv($resource);
 		
 		while (($row = fgetcsv($resource)) !== false) {
 			[$description, $amount, $date, $category] = $row;
 			$date = new DateTime($date);
-			$category = $this->categoryService->getByName($category);
+			$category = $categories[strtolower($category)] ?? null;
 			$amount = (float) (str_replace(['$', ','], '', $amount));
 
 			$transactionData = new TransactionData($description, $amount, $date, $category);
