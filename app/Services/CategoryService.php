@@ -5,7 +5,7 @@ namespace App\Services;
 use App\DataObjects\DataTableQueryParams;
 use App\Entity\User;
 use App\Entity\Category;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CategoryService extends EntityManagerService

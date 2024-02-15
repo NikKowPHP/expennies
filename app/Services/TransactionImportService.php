@@ -9,7 +9,7 @@ use Clockwork\Request\LogLevel;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Transaction;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use App\DataObjects\TransactionData;
 use App\DataObjects\DataTableQueryParams;
 use Doctrine\ORM\Tools\Pagination\Paginator;
