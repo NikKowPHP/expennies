@@ -208,7 +208,6 @@ window.addEventListener("DOMContentLoaded", function () {
   document
     .querySelector(".import-transactions-btn")
     .addEventListener("click", function (event) {
-
       const formData = new FormData();
       const files =
         importTransactionsModal._element.querySelector(
@@ -219,13 +218,16 @@ window.addEventListener("DOMContentLoaded", function () {
         formData.append("importFile", files[i]);
       }
 
-      post("/transactions/import", formData, importTransactionsModal._element)
-        .then((response) => {
-          if (response.ok) {
-            table.draw();
-            importTransactionsModal.hide();
-          }
-        });
+      post(
+        "/transactions/import",
+        formData,
+        importTransactionsModal._element
+      ).then((response) => {
+        if (response.ok) {
+          table.draw();
+          importTransactionsModal.hide();
+        }
+      });
     });
 });
 

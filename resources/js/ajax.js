@@ -28,7 +28,6 @@ const ajax = (url, method = "get", data = {}, domElement = null) => {
   } else if (method === "get") {
     url += "?" + new URLSearchParams(data).toString();
   }
-  console.log(options)
 
   return fetch(url, options).then((response) => {
     if (domElement) {

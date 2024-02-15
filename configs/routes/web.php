@@ -15,6 +15,7 @@ use App\Controllers\TransactionController;
 
 return function (App $app) {
     $app->get('/', [HomeController::class, 'index'])->add(AuthMiddleware::class);
+    $app->post('/logout', [AuthController::class, 'logOut'])->add(AuthMiddleware::class);
 
     $app->group('', function (RouteCollectorProxy $guest) {
         $guest->get('/login', [AuthController::class, 'loginView']);
@@ -22,7 +23,6 @@ return function (App $app) {
         $guest->post('/login', [AuthController::class, 'logIn']);
         $guest->post('/register', [AuthController::class, 'register']);
     })->add(GuestMiddleware::class);
-    $app->post('/logout', [AuthController::class, 'logOut'])->add(AuthMiddleware::class);
 
     $app->group('/categories', function (RouteCollectorProxy $categories) {
         $categories->get('', [CategoryController::class, 'index']);
