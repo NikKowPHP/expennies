@@ -20,8 +20,6 @@ class ReceiptController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly ReceiptService $receiptService,
         private readonly TransactionService $transactionService,
-
-
     ) {
     }
 
@@ -42,6 +40,7 @@ class ReceiptController
         $this->filesystem->write('receipts/' . $randomFilename, $file->getStream()->getContents());
 
         $this->receiptService->create($transaction, $filename, $randomFilename , $file->getClientMediaType());
+        $this->receiptService->flush();
 
 
         return $response;
@@ -75,6 +74,7 @@ class ReceiptController
     {
 
         $this->receiptService->delete((int) $args['id']);
+        $this->receiptService->flush();
         return $response;
     }
 }

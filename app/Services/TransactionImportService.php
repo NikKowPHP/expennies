@@ -14,10 +14,9 @@ use App\DataObjects\TransactionData;
 use App\DataObjects\DataTableQueryParams;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class TransactionImportService
+class TransactionImportService extends EntityManagerService
 {
 	public function __construct(
-		private readonly EntityManager $entityManager,
 		private readonly TransactionService $transactionService,
 		private readonly CategoryService $categoryService,
 		private readonly Clockwork $clockwork,
