@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 services:
   app:
@@ -6,9 +6,10 @@ services:
       context: ""
       dockerfile: Dockerfile
       args:
-        USER_ID: '${WWWUSER:-1000}'
-        GROUP_ID: '${WWWGROUP:-1000}'
-        USER: '${USER:-whoami}'
+        - USER_ID=${WWWUSER:-1000}
+        - GROUP_ID=${WWWGROUP:-1000}
+        - USER=${USER:-whoami}
+        - HTTP_PROXY=http://172.16.2.254:3128
     container_name: expennies-app
     restart: always
     working_dir: /var/www/
@@ -19,6 +20,13 @@ services:
     volumes:
       - ../:/var/www
       - ./local.ini:/usr/local/etc/php/conf.d/local.ini
+    environment:
+      - http_proxy=http://172.16.2.254:3128
+      - https_proxy=http://172.16.2.254:3128
+      - HTTP_PROXY=http://172.16.2.254:3128
+      - HTTPS_PROXY=http://172.16.2.254:3128
+      - no_proxy=localhost,127.0.0.1,host.docker.internal
+      - DNS_SERVER=8.8.8.8
   nginx:
     image: nginx:1.19-alpine
     container_name: expennies-nginx
