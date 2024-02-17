@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 use App\Auth;
 use App\Csrf;
-use Clockwork\Clockwork;
-use Clockwork\DataSource\DoctrineDataSource;
-use Clockwork\Storage\FileStorage;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Slim\App;
 use App\Config;
 use App\Session;
@@ -16,22 +11,29 @@ use Slim\Csrf\Guard;
 use Slim\Views\Twig;
 use App\Enum\SameSite;
 use function DI\create;
+use Clockwork\Clockwork;
 use Doctrine\ORM\ORMSetup;
 use App\Enum\StorageDriver;
 use App\Enum\AppEnvironment;
 use Slim\Factory\AppFactory;
+use Doctrine\ORM\EntityManager;
 use App\Contracts\AuthInterface;
 use League\Flysystem\Filesystem;
 use App\DataObjects\SessionConfig;
+use Clockwork\Storage\FileStorage;
 use Twig\Extra\Intl\IntlExtension;
 use App\Contracts\SessionInterface;
 use Symfony\Component\Asset\Package;
 use App\Services\UserProviderService;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Asset\Packages;
+use App\Services\EntityManagerService;
+use Doctrine\ORM\EntityManagerInterface;
+use Clockwork\DataSource\DoctrineDataSource;
 use Psr\Http\Message\ResponseFactoryInterface;
 
 use App\Contracts\UserProviderServiceInterface;
+use App\Contracts\EntityManagerServiceInterface;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use App\RequestValidators\RequestValidatorFactory;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
@@ -116,5 +118,6 @@ return [
         $clockwork->storage(new FileStorage(STORAGE_PATH . '/clockwork'));
         $clockwork->addDataSource(new DoctrineDataSource($entityManager));
         return $clockwork;
-    }
+    },
+    EntityManagerServiceInterface::class => fn(EntityManagerInterface $entityManager) => new EntityManagerService($entityManager),
 ];
