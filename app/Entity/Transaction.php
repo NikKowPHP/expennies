@@ -28,10 +28,13 @@ class Transaction
 	#[Id, Column(options: ['unsigned' => true]), GeneratedValue]
 	private int $id;
 
+	#[Column(name: 'was_reviewed', options: ['default' => 0])]
+	private bool $wasReviewed;
+
 	#[Column]
 	private string $description;
 
-	#[Column(name: 'amount', type:Types::DECIMAL, precision: 13, scale: 3)]
+	#[Column(name: 'amount', type: Types::DECIMAL, precision: 13, scale: 3)]
 	private float $amount;
 
 	#[Column]
@@ -91,8 +94,7 @@ class Transaction
 	{
 		return $this->user;
 	}
-
-	public function setUser(User $user): Transaction 
+	public function setUser(User $user): Transaction
 	{
 		$user->addTransaction($this);
 		$this->user = $user;
@@ -130,6 +132,15 @@ class Transaction
 		if ($this->receipts->removeElement($receipt)) {
 			$receipt->setTransaction(null);
 		}
+	}
+	public function wasReviewed(): bool
+	{
+		return $this->wasReviewed;
+	}
+	public function setReviewed(bool $wasReviewed): Transaction
+	{
+		$this->wasReviewed = $wasReviewed;
+		return $this;
 	}
 
 }
