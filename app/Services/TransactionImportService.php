@@ -9,10 +9,7 @@ use Clockwork\Request\LogLevel;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Transaction;
-use Doctrine\ORM\EntityManagerInterface;
 use App\DataObjects\TransactionData;
-use App\DataObjects\DataTableQueryParams;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class TransactionImportService extends EntityManagerService
 {
@@ -20,8 +17,7 @@ class TransactionImportService extends EntityManagerService
 		private readonly TransactionService $transactionService,
 		private readonly CategoryService $categoryService,
 		private readonly Clockwork $clockwork,
-
-
+		private readonly EntityManagerService $entityManagerService,
 	) {
 	}
 	public function importFromFile(string $file, User $user): void
@@ -36,7 +32,7 @@ class TransactionImportService extends EntityManagerService
 		$batchSize = 250;
 
 		$this->clockwork->log(LogLevel::DEBUG, 'Memory Usage Before: ' . memory_get_usage());
-		$this->clockwork->log(LogLevel::DEBUG, 'Unit of work Before: ' . $this->entityManager->getUnitOfWork()->size());
+		$this->clockwork->log(LogLevel::DEBUG, 'Unit of work Before: ' . $this->entityManagerService->getUnitOfWork()->size());
 
 		while (($row = fgetcsv($resource)) !== false) {
 			[$description, $amount, $date, $category] = $row;
@@ -47,8 +43,8 @@ class TransactionImportService extends EntityManagerService
 			$transactionData = new TransactionData($description, $amount, $date, $category);
 			$this->transactionService->create($transactionData, $user);
 			if ($count % $batchSize === 0) {
-				$this->entityManager->flush();
-				$this->entityManager->clear(Transaction::class);
+				$this->entityManagerService->flush();
+				$this->entityManagerService->clear(Transaction::class);
 
 				$count = 1;
 			} else {
@@ -57,8 +53,8 @@ class TransactionImportService extends EntityManagerService
 
 		}
 		if ($count > 1) {
-			$this->entityManager->flush();
-			$this->entityManager->clear();
+			$this->entityManagerService->flush();
+			$this->entityManagerService->clear();
 		}
 
 
