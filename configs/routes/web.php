@@ -43,6 +43,7 @@ return function (App $app) {
         $transactions->get('/{transactionId:[0-9]+}/receipts/{id:[0-9]+}', [ReceiptController::class, 'download']);
         $transactions->post('/import', [ImportTransactionsController::class, 'import']);
         $transactions->delete('/{transactionId:[0-9]+}/receipts/{id:[0-9]+}', [ReceiptController::class, 'delete']);
+        $transactions->post('/{id:[0-9]+}/review', [TransactionController::class, 'toggleReviewed']);
 
     })->add(AuthMiddleware::class);
 };
