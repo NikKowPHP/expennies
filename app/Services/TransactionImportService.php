@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Clockwork\Clockwork;
-use Clockwork\Request\LogLevel;
 use DateTime;
 use App\Entity\User;
+use Clockwork\Clockwork;
 use App\Entity\Transaction;
+use Clockwork\Request\LogLevel;
 use App\DataObjects\TransactionData;
+use App\Contracts\EntityManagerServiceInterface;
 
 class TransactionImportService extends EntityManagerService
 {
@@ -17,7 +18,7 @@ class TransactionImportService extends EntityManagerService
 		private readonly TransactionService $transactionService,
 		private readonly CategoryService $categoryService,
 		private readonly Clockwork $clockwork,
-		private readonly EntityManagerService $entityManagerService,
+		private readonly EntityManagerServiceInterface $entityManagerService,
 	) {
 	}
 	public function importFromFile(string $file, User $user): void
@@ -41,10 +42,11 @@ class TransactionImportService extends EntityManagerService
 			$amount = (float) (str_replace(['$', ','], '', $amount));
 
 			$transactionData = new TransactionData($description, $amount, $date, $category);
-			$this->transactionService->create($transactionData, $user);
+			$transaction = $this->transactionService->create($transactionData, $user);
 			if ($count % $batchSize === 0) {
-				$this->entityManagerService->flush();
-				$this->entityManagerService->clear(Transaction::class);
+
+				$this->entityManagerService->sync($transaction);
+				$this->entityManagerService->clear();
 
 				$count = 1;
 			} else {
@@ -53,7 +55,7 @@ class TransactionImportService extends EntityManagerService
 
 		}
 		if ($count > 1) {
-			$this->entityManagerService->flush();
+			$this->entityManagerService->sync($transaction);
 			$this->entityManagerService->clear();
 		}
 
