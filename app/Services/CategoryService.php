@@ -2,16 +2,18 @@
 declare(strict_types=1);
 namespace App\Services;
 
-use App\Contracts\EntityManagerServiceInterface;
-use App\DataObjects\DataTableQueryParams;
 use App\Entity\User;
 use App\Entity\Category;
+use App\DataObjects\DataTableQueryParams;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use App\Contracts\EntityManagerServiceInterface;
 
 class CategoryService 
 {
+
 	public function __construct(private readonly EntityManagerServiceInterface $entityManager)
-	{}
+	{
+	}
 
 	public function create(string $name, User $user): Category
 	{
@@ -49,6 +51,7 @@ class CategoryService
 	}
 
 
+
 	public function getById(int $id): ?Category
 	{
 		return $this->entityManager->find(Category::class, $id);
@@ -65,6 +68,7 @@ class CategoryService
 	public function update(Category $category, string $name): Category
 	{
 		$category->setName($name);
+
 		return $category;
 
 	}

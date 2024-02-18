@@ -85,7 +85,7 @@ class Receipt
 		return $this->transaction;
 	}
 
-	public function setTransaction(Transaction $transaction): Receipt
+	public function setTransaction(?Transaction $transaction): Receipt
 	{
 		$transaction->addReceipt($this);
 		$this->transaction = $transaction;

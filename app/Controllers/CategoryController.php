@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Contracts\EntityManagerServiceInterface;
-use App\Entity\Category;
-use App\Services\RequestService;
 use Slim\Views\Twig;
+use App\Entity\Category;
 use App\ResponseFormatter;
+use App\Services\RequestService;
 use App\Services\CategoryService;
+use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -49,8 +49,8 @@ class CategoryController
 	public function delete(Request $request, Response $response, array $args): Response
 	{
 		$category = $this->categoryService->getById((int) $args['id']);
-		$this->entityManagerService->delete($category, true);
 
+		$this->entityManagerService->delete($category, true);
 		return $response;
 	}
 	public function get(Request $request, Response $response, array $args): Response

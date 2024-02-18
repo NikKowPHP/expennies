@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Entity\Receipt;
 use App\Contracts\EntityManagerServiceInterface;
 
-class ReceiptService
+class ReceiptService 
 {
     public function __construct(private readonly EntityManagerServiceInterface $entityManager)
     {
@@ -15,13 +15,12 @@ class ReceiptService
 
     public function create($transaction, string $filename, string $storageFilename, string $mediaType): Receipt
     {
-        $receipt = new Receipt();
-        $receipt->setTransaction($transaction);
-        $receipt->setFilename($filename);
-        $receipt->setStorageFilename($storageFilename);
-        $receipt->setCreatedAt(new \DateTime());
-        $receipt->setMediaType($mediaType);
-
+			$receipt = new Receipt();
+			$receipt->setTransaction($transaction);
+			$receipt->setFilename($filename);
+			$receipt->setStorageFilename($storageFilename);
+			$receipt->setCreatedAt(new \DateTime());
+			$receipt->setMediaType($mediaType);
 
         return $receipt;
     }

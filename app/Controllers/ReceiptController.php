@@ -21,7 +21,7 @@ class ReceiptController
         private readonly RequestValidatorFactoryInterface $requestValidatorFactory,
         private readonly ReceiptService $receiptService,
         private readonly TransactionService $transactionService,
-        private readonly EntityManagerServiceInterface $entityManagerService,
+        private readonly EntityManagerServiceInterface $entityManagerService
     ) {
     }
 
@@ -75,8 +75,27 @@ class ReceiptController
     public function delete(Request $request, Response $response, array $args): Response
     {
 
-        $receipt = $this->receiptService->getById((int) $args['id']);
+
+        // $this->receiptService->delete((int) $args['id']);
+        // $this->receiptService->flush();
+
+
+        $transactionId = (int) $args['transactionId'];
+        $receiptId     = (int) $args['id'];
+        if (! $transactionId || ! $this->transactionService->getById($transactionId)) {
+            return $response->withStatus(404);
+        }
+        if (! $receiptId || ! ($receipt = $this->receiptService->getById($receiptId))) {
+            return $response->withStatus(404);
+        }
+        if ($receipt->getTransaction()->getId() !== $transactionId) {
+            return $response->withStatus(401);
+        }
+
+        $this->filesystem->delete('receipts/' . $receipt->getStorageFilename());
+
         $this->entityManagerService->delete($receipt, true);
+
         return $response;
     }
 }

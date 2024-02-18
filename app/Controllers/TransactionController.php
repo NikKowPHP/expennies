@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use DateTime;
+use Slim\Views\Twig;
+use App\Entity\Receipt;
+use App\ResponseFormatter;
+use App\Entity\Transaction;
+use App\Services\RequestService;
+use App\Services\CategoryService;
+use App\DataObjects\TransactionData;
+use App\Services\TransactionService;
 use App\Contracts\EntityManagerServiceInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
-use App\DataObjects\TransactionData;
-use App\Entity\Receipt;
-use App\Entity\Transaction;
-use App\RequestValidators\TransactionRequestValidator;
-use App\ResponseFormatter;
-use App\Services\CategoryService;
-use App\Services\RequestService;
-use App\Services\TransactionService;
-use DateTime;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Views\Twig;
+use App\RequestValidators\TransactionRequestValidator;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class TransactionController
 {
@@ -28,7 +28,7 @@ class TransactionController
         private readonly ResponseFormatter $responseFormatter,
         private readonly RequestService $requestService,
         private readonly CategoryService $categoryService,
-        private readonly EntityManagerServiceInterface $entityManagerService,
+        private readonly EntityManagerServiceInterface $entityManagerService
     ) {
     }
 
@@ -56,6 +56,7 @@ class TransactionController
             ),
             $request->getAttribute('user')
         );
+
         $this->entityManagerService->sync($transaction);
 
         return $response;
@@ -63,6 +64,8 @@ class TransactionController
 
     public function delete(Request $request, Response $response, array $args): Response
     {
+        // $this->transactionService->delete((int) $args['id']);
+        // $this->transactionService->flush();
         $transaction = $this->transactionService->getById((int) $args['id']);
         $this->entityManagerService->delete($transaction, true);
 
@@ -108,7 +111,8 @@ class TransactionController
                 new DateTime($data['date']),
                 $data['category']
             )
-        ));
+        )
+        );
 
         return $response;
     }
@@ -141,7 +145,7 @@ class TransactionController
             $totalTransactions
         );
     }
-    
+
     public function toggleReviewed(Request $request, Response $response, array $args): Response
     {
         $id = (int) $args['id'];
@@ -151,7 +155,6 @@ class TransactionController
         }
         $this->transactionService->toggleReviewed($transaction);
         $this->entityManagerService->sync();
-
         return $response;
     }
 }

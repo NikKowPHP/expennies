@@ -23,6 +23,7 @@ use App\DataObjects\SessionConfig;
 use Clockwork\Storage\FileStorage;
 use Twig\Extra\Intl\IntlExtension;
 use App\Contracts\SessionInterface;
+use App\RouteEntityBindingStrategy;
 use Symfony\Component\Asset\Package;
 use App\Services\UserProviderService;
 use Psr\Container\ContainerInterface;
@@ -30,8 +31,8 @@ use Symfony\Component\Asset\Packages;
 use App\Services\EntityManagerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Clockwork\DataSource\DoctrineDataSource;
-use Psr\Http\Message\ResponseFactoryInterface;
 
+use Psr\Http\Message\ResponseFactoryInterface;
 use App\Contracts\UserProviderServiceInterface;
 use App\Contracts\EntityManagerServiceInterface;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
@@ -50,6 +51,13 @@ return [
         $router = require CONFIG_PATH . '/routes/web.php';
 
         $app = AppFactory::create();
+
+        $app->getRouteCollector()->setDefaultInvocationStrategy(
+            new RouteEntityBindingStrategy(
+                $container->get(EntityManagerServiceInterface::class),
+                $app->getResponseFactory()
+            )
+        );
 
         $router($app);
         $addMiddlewares($app);

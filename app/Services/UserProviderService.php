@@ -13,8 +13,8 @@ class UserProviderService implements UserProviderServiceInterface
 {
 	public function __construct(private readonly EntityManagerServiceInterface $entityManager)
 	{
-
 	}
+	
 	public function getById(int $userId): ?UserInterface
 	{
 		return $this->entityManager->find(User::class, $userId);
@@ -35,7 +35,6 @@ class UserProviderService implements UserProviderServiceInterface
 		$user->setPassword(password_hash($data->password, PASSWORD_BCRYPT, ['cost' => 12]));
 
 		$this->entityManager->sync($user);
-
 
 		return $user;
 	}

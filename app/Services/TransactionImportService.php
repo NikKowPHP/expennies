@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
+use Clockwork\Clockwork;
+use Clockwork\Request\LogLevel;
 use DateTime;
 use App\Entity\User;
 use Clockwork\Clockwork;
@@ -44,9 +47,8 @@ class TransactionImportService extends EntityManagerService
 			$transactionData = new TransactionData($description, $amount, $date, $category);
 			$transaction = $this->transactionService->create($transactionData, $user);
 			if ($count % $batchSize === 0) {
-
-				$this->entityManagerService->sync($transaction);
-				$this->entityManagerService->clear();
+				$this->entityManagerService->sync();
+				$this->entityManagerService->clear(Transaction::class);
 
 				$count = 1;
 			} else {
@@ -55,7 +57,8 @@ class TransactionImportService extends EntityManagerService
 
 		}
 		if ($count > 1) {
-			$this->entityManagerService->sync($transaction);
+
+			$this->entityManagerService->sync();
 			$this->entityManagerService->clear();
 		}
 
