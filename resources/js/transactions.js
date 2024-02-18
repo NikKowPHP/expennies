@@ -151,7 +151,9 @@ window.addEventListener("DOMContentLoaded", function () {
       if (editBtn) {
         const transactionId = editBtn.getAttribute("data-id");
 
-        get(`/transactions/${transactionId}`).then((response) =>
+        get(`/transactions/${transactionId}`)
+        .then((response )=> response.json())
+        .then((response) =>
           openEditTransactionModal(editTransactionModal, response)
         );
       } else if (deleteBtn) {
