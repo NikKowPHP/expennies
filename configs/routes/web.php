@@ -37,12 +37,12 @@ return function (App $app) {
         $transactions->post('', [TransactionController::class, 'store']);
         $transactions->get('/load', [TransactionController::class, 'load']);
         $transactions->post('/import', [ImportTransactionsController::class, 'import']);
-        $transactions->delete('/{id:[0-9]+}', [TransactionController::class, 'delete']);
+        $transactions->delete('/{transaction}', [TransactionController::class, 'delete']);
         $transactions->get('/{transaction}', [TransactionController::class, 'get']);
         $transactions->post('/{transaction}', [TransactionController::class, 'update']);
-        $transactions->post('/{id:[0-9]+}/receipts', [ReceiptController::class, 'store']);
-        $transactions->get('/{transactionId:[0-9]+}/receipts/{id:[0-9]+}', [ReceiptController::class, 'download']);
-        $transactions->delete('/{transactionId:[0-9]+}/receipts/{id:[0-9]+}', [ReceiptController::class, 'delete']);
+        $transactions->post('/{transaction}/receipts', [ReceiptController::class, 'store']);
+        $transactions->get('/{transaction}/receipts/{receipt}', [ReceiptController::class, 'download']);
+        $transactions->delete('/{transaction}/receipts/{receipt}', [ReceiptController::class, 'delete']);
         $transactions->post('/{transaction}/review', [TransactionController::class, 'toggleReviewed']);
 
     })->add(AuthMiddleware::class);
