@@ -36,14 +36,14 @@ return function (App $app) {
         $transactions->get('', [TransactionController::class, 'index']);
         $transactions->post('', [TransactionController::class, 'store']);
         $transactions->get('/load', [TransactionController::class, 'load']);
+        $transactions->post('/import', [ImportTransactionsController::class, 'import']);
         $transactions->delete('/{id:[0-9]+}', [TransactionController::class, 'delete']);
         $transactions->get('/{transaction}', [TransactionController::class, 'get']);
-        $transactions->post('/{id:[0-9]+}', [TransactionController::class, 'update']);
+        $transactions->post('/{transaction}', [TransactionController::class, 'update']);
         $transactions->post('/{id:[0-9]+}/receipts', [ReceiptController::class, 'store']);
         $transactions->get('/{transactionId:[0-9]+}/receipts/{id:[0-9]+}', [ReceiptController::class, 'download']);
-        $transactions->post('/import', [ImportTransactionsController::class, 'import']);
         $transactions->delete('/{transactionId:[0-9]+}/receipts/{id:[0-9]+}', [ReceiptController::class, 'delete']);
-        $transactions->post('/{id:[0-9]+}/review', [TransactionController::class, 'toggleReviewed']);
+        $transactions->post('/{transaction}/review', [TransactionController::class, 'toggleReviewed']);
 
     })->add(AuthMiddleware::class);
 };
