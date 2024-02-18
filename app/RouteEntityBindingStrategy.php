@@ -57,7 +57,7 @@ class RouteEntityBindingStrategy implements InvocationStrategyInterface
 					}
 					$entity = $this->entityManagerService->find($typeName, $entityId);
 					if(! $entity) {
-						return $this->responseFactory->createResponse(404);
+						return $this->responseFactory->createResponse(404, 'Resource not found');
 					}
 					$resolvedArguments[] = $entity;
 
