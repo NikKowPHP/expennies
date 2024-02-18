@@ -16,10 +16,6 @@ class TransactionService
 	public function __construct(private readonly EntityManagerServiceInterface $entityManager)
 	{}
 
-	   public function __construct(private readonly EntityManagerServiceInterface $entityManager)
-    {
-    }
-
 	public function create(TransactionData $transactionData, User $user): Transaction
 	{
 		$transaction = new Transaction();

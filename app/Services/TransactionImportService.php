@@ -9,11 +9,8 @@ use Clockwork\Clockwork;
 use Clockwork\Request\LogLevel;
 use DateTime;
 use App\Entity\User;
-use Clockwork\Clockwork;
 use App\Entity\Transaction;
-use Clockwork\Request\LogLevel;
 use App\DataObjects\TransactionData;
-use App\Contracts\EntityManagerServiceInterface;
 
 class TransactionImportService extends EntityManagerService
 {
