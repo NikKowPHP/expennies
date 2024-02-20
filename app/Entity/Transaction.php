@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Entity\Receipt;
 use App\Entity\Category;
+use App\Traits\HasTimestamps;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Table;
@@ -18,26 +20,25 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 
 #[Entity, Table('transactions')]
+#[HasLifecycleCallbacks]
 class Transaction
 {
+	use HasTimestamps;
 
 	#[Id, Column(options: ['unsigned' => true]), GeneratedValue]
 	private int $id;
 
+	#[Column(name: 'was_reviewed', options: ['default' => 0])]
+	private bool $wasReviewed;
+
 	#[Column]
 	private string $description;
 
-	#[Column(name: 'amount', type:Types::DECIMAL, precision: 13, scale: 3)]
+	#[Column(name: 'amount', type: Types::DECIMAL, precision: 13, scale: 3)]
 	private float $amount;
 
 	#[Column]
 	private \DateTime $date;
-
-	#[Column(name: 'created_at')]
-	private \DateTime $createdAt;
-
-	#[Column(name: 'updated_at')]
-	private \DateTime $updatedAt;
 
 	#[ManyToOne(inversedBy: 'transactions')]
 	private User $user;
@@ -51,6 +52,7 @@ class Transaction
 	public function __construct()
 	{
 		$this->receipts = new ArrayCollection();
+		$this->wasReviewed = false;
 	}
 
 	public function getId(): int
@@ -88,32 +90,12 @@ class Transaction
 		$this->date = $date;
 	}
 
-	public function getCreatedAt(): \DateTime
-	{
-		return $this->createdAt;
-	}
-
-	public function setCreatedAt(\DateTime $createdAt): void
-	{
-		$this->createdAt = $createdAt;
-	}
-
-	public function getUpdatedAt(): \DateTime
-	{
-		return $this->updatedAt;
-	}
-
-	public function setUpdatedAt(\DateTime $updatedAt): void
-	{
-		$this->updatedAt = $updatedAt;
-	}
 
 	public function getUser(): User
 	{
 		return $this->user;
 	}
-
-	public function setUser(User $user): Transaction 
+	public function setUser(User $user): Transaction
 	{
 		$user->addTransaction($this);
 		$this->user = $user;
@@ -151,6 +133,15 @@ class Transaction
 		if ($this->receipts->removeElement($receipt)) {
 			$receipt->setTransaction(null);
 		}
+	}
+	public function wasReviewed(): bool
+	{
+		return $this->wasReviewed;
+	}
+	public function setReviewed(bool $wasReviewed): Transaction
+	{
+		$this->wasReviewed = $wasReviewed;
+		return $this;
 	}
 
 }

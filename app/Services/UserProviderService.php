@@ -2,18 +2,19 @@
 declare(strict_types=1);
 namespace App\Services;
 
+use App\Contracts\EntityManagerServiceInterface;
 use App\DataObjects\RegisterUserData;
 use App\Entity\User;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Contracts\UserInterface;
 use App\Contracts\UserProviderServiceInterface;
 
 class UserProviderService implements UserProviderServiceInterface
 {
-	public function __construct(private readonly EntityManager $entityManager)
+	public function __construct(private readonly EntityManagerServiceInterface $entityManager)
 	{
-
 	}
+	
 	public function getById(int $userId): ?UserInterface
 	{
 		return $this->entityManager->find(User::class, $userId);
@@ -33,8 +34,7 @@ class UserProviderService implements UserProviderServiceInterface
 		$user->setEmail($data->email);
 		$user->setPassword(password_hash($data->password, PASSWORD_BCRYPT, ['cost' => 12]));
 
-		$this->entityManager->persist($user);
-		$this->entityManager->flush();
+		$this->entityManager->sync($user);
 
 		return $user;
 	}
