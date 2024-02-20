@@ -27,13 +27,17 @@ use Twig\Extra\Intl\IntlExtension;
 use App\Contracts\SessionInterface;
 use App\RouteEntityBindingStrategy;
 use Symfony\Component\Asset\Package;
+use Symfony\Component\Mailer\Mailer;
 use App\Services\UserProviderService;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Asset\Packages;
 use App\Services\EntityManagerService;
+use Symfony\Component\Mailer\Transport;
+
 use Doctrine\ORM\EntityManagerInterface;
 
 use Clockwork\DataSource\DoctrineDataSource;
+use Symfony\Component\Mailer\MailerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use App\Contracts\UserProviderServiceInterface;
 use App\Contracts\EntityManagerServiceInterface;
@@ -136,4 +140,9 @@ return [
         return $clockwork;
     },
     EntityManagerServiceInterface::class => fn(EntityManagerInterface $entityManager) => new EntityManagerService($entityManager),
+    MailerInterface::class => function(Config $config) {
+        $transport = Transport::fromDsn($config->get('mailer.dsn'));
+        return new Mailer($transport);
+
+    },
 ];
