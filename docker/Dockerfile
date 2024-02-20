@@ -43,14 +43,20 @@ RUN echo 'http_proxy = "http://172.16.2.254:3128"' >> /etc/pear.conf \
 
 RUN pear config-set http_proxy http://172.16.2.254:3128 
 
-# Create the group before adding the user
-RUN groupadd --force -g ${GROUP_ID} $USER
-
+# Check if the group exists before creating it
+# Check if the group exists before creating it
+RUN getent group ${GROUP_ID} || groupadd -g ${GROUP_ID} appgroup
 # Add the user to the existing group
-RUN useradd -ms /bin/bash -g ${GROUP_ID} -u 1337 $USER
+# Check if the user exists before creating it
+# RUN id -u $USER > /dev/null 2>&1 || useradd -ms /bin/bash -g ${GROUP_ID} -u 1337 $USER
 
-# Update the user ID
-RUN usermod -u $USER_ID $USER
+
+
+# Check if the user exists before creating it
+RUN id -u $USER > /dev/null 2>&1 || useradd -ms /bin/bash -g ${GROUP_ID} -u ${USER_ID} $USER
+
+# Modify the UID of the user (if needed)
+# RUN usermod -u ${USER_ID} $USER
 
 # Switch to the user
 USER $USER
