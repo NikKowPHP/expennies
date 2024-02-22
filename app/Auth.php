@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Mail\SignupEmail;
 use App\Contracts\AuthInterface;
 use App\Contracts\UserInterface;
 use App\Contracts\SessionInterface;
@@ -13,7 +14,8 @@ class Auth implements AuthInterface
     private ?UserInterface $user = null;
     public function __construct(
         private readonly UserProviderServiceInterface $userProvider,
-        private readonly SessionInterface $session
+        private readonly SessionInterface $session,
+        private readonly SignupEmail $signupEmail
     ) {}
     public function user(): ?UserInterface
     {
@@ -62,8 +64,10 @@ class Auth implements AuthInterface
         $user = $this->userProvider->createUser($data);
 
         // send email
+        
+        
 
-        // $this->signupEmail->send($user->getEmail);
+        $this->signupEmail->send($user->getEmail());
 
         $this->logIn($user);
 
