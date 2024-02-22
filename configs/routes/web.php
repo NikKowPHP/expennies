@@ -47,12 +47,15 @@ return function (App $app) {
         });
     })->add(AuthMiddleware::class);
 
+    $app->group('', function (RouteCollectorProxy $group) {
+        $group->post('/logout', [AuthController::class, 'logOut']);
+        $group->get('/verify', [VerifyController::class, 'index'])->add(VerifyEmailMiddleware::class);
+    })->add(AuthMiddleware::class);
+
     $app->group('', function (RouteCollectorProxy $guest) {
         $guest->get('/login', [AuthController::class, 'loginView']);
         $guest->get('/register', [AuthController::class, 'registerView']);
+        $guest->post('/login', [AuthController::class, 'loginView']);
+        $guest->post('/register', [AuthController::class, 'registerView']);
     })->add(GuestMiddleware::class);
-    $app->group('', function (RouteCollectorProxy $group) {
-        $group->post('/logout', [AuthController::class, 'logOut'])->add(AuthMiddleware::class);
-        $group->get('/verify', [VerifyController::class, 'index'])->add(VerifyEmailMiddleware::class);
-    })->add(AuthMiddleware::class);
 };
