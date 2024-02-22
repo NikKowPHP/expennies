@@ -45,7 +45,7 @@ return function (App $app) {
             );
             $transactions->post('/{transaction}/review', [TransactionController::class, 'toggleReviewed']);
         });
-    })->add(AuthMiddleware::class);
+    })->add(VerifyEmailMiddleware::class)->add(AuthMiddleware::class);
 
     $app->group('', function (RouteCollectorProxy $group) {
         $group->post('/logout', [AuthController::class, 'logOut']);
