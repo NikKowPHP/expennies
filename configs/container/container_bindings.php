@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Auth;
 use App\Csrf;
+use App\Filters\UserFilter;
 use Slim\App;
 use App\Config;
 use App\Session;
@@ -18,6 +19,7 @@ use App\Enum\AppEnvironment;
 use Slim\Factory\AppFactory;
 use Doctrine\ORM\EntityManager;
 use App\Contracts\AuthInterface;
+use Doctrine\DBAL\DriverManager;
 use League\Flysystem\Filesystem;
 use App\DataObjects\SessionConfig;
 use Clockwork\Storage\FileStorage;
@@ -33,6 +35,7 @@ use App\Services\EntityManagerService;
 use Symfony\Component\Mailer\Transport;
 
 use Doctrine\ORM\EntityManagerInterface;
+
 use Clockwork\DataSource\DoctrineDataSource;
 use Symfony\Component\Mailer\MailerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -69,13 +72,19 @@ return [
     },
     Config::class => create(Config::class)->constructor(require CONFIG_PATH . '/app.php'),
 
-    EntityManagerInterface::class => fn(Config $config) => EntityManager::create(
-        $config->get('doctrine.connection'),
-        ORMSetup::createAttributeMetadataConfiguration(
+    EntityManagerInterface::class           => function (Config $config) {
+        $ormConfig = ORMSetup::createAttributeMetadataConfiguration(
             $config->get('doctrine.entity_dir'),
             $config->get('doctrine.dev_mode')
-        )
-    ),
+        );
+
+        $ormConfig->addFilter('user', UserFilter::class);
+
+        return new EntityManager(
+            DriverManager::getConnection($config->get('doctrine.connection'), $ormConfig),
+            $ormConfig
+        );
+    }, 
     Twig::class => function (Config $config, ContainerInterface $container) {
         $twig = Twig::create(VIEW_PATH, [
             'cache' => STORAGE_PATH . '/cache/templates',
