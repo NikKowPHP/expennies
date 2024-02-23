@@ -8,6 +8,7 @@ use Slim\App;
 use App\Config;
 use App\Session;
 use Slim\Csrf\Guard;
+use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use App\Enum\SameSite;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
@@ -137,5 +138,6 @@ return [
         $transport = Transport::fromDsn($config->get('mailer.dsn'));
         return new Mailer($transport);
     },
-    BodyRendererInterface::class => fn(Twig $twig) => new BodyRenderer($twig->getEnvironment())
+    BodyRendererInterface::class => fn(Twig $twig) => new BodyRenderer($twig->getEnvironment()),
+    RouteParserInterface::class => fn(App $app) => $app->getRouteCollector()->getRouteParser(),
 ];
