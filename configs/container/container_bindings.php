@@ -57,6 +57,7 @@ return [
         $router = require CONFIG_PATH . '/routes/web.php';
 
         $app = AppFactory::create();
+        $app->addErrorMiddleware(true, true, true);
 
         $app->getRouteCollector()->setDefaultInvocationStrategy(
             new RouteEntityBindingStrategy(
