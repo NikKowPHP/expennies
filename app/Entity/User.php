@@ -139,4 +139,8 @@ class User implements UserInterface
     {
         return $this->verifiedAt;
     }
+	public function setVerifiedAt( ?\DateTimeInterface $verifiedAt): void
+    {
+        $this->verifiedAt = $verifiedAt;
+    }
 }

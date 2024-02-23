@@ -1,21 +1,22 @@
 <?php declare(strict_types = 1);
 
-use Slim\App;
-use App\Middleware\AuthMiddleware;
 use App\Controllers\AuthController;
-use App\Controllers\HomeController;
-use App\Middleware\GuestMiddleware;
-use App\Controllers\VerifyController;
-use Slim\Routing\RouteCollectorProxy;
-use App\Controllers\ReceiptController;
 use App\Controllers\CategoryController;
-use App\Middleware\VerifyEmailMiddleware;
-use App\Controllers\TransactionController;
+use App\Controllers\HomeController;
 use App\Controllers\ImportTransactionsController;
+use App\Controllers\ReceiptController;
+use App\Controllers\TransactionController;
+use App\Controllers\VerifyController;
+use App\Middleware\AuthMiddleware;
+use App\Middleware\GuestMiddleware;
+use App\Middleware\ValidateSignatureMiddleware;
+use App\Middleware\VerifyEmailMiddleware;
+use Slim\App;
+use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
     $app->group('', function (RouteCollectorProxy $group) {
-        $group->get('/', [HomeController::class, 'index'])->add(AuthMiddleware::class);
+        $group->get('/', [HomeController::class, 'index']);
 
         $group->group('/categories', function (RouteCollectorProxy $categories) {
             $categories->get('', [CategoryController::class, 'index']);
@@ -49,13 +50,15 @@ return function (App $app) {
 
     $app->group('', function (RouteCollectorProxy $group) {
         $group->post('/logout', [AuthController::class, 'logOut']);
-        $group->get('/verify', [VerifyController::class, 'index'])->add(VerifyEmailMiddleware::class);
+        $group->get('/verify', [VerifyController::class, 'index']);
+        $group->get('/verify/{id}/{hash}', [VerifyController::class, 'verify'])->setName('verify')
+        ->add(ValidateSignatureMiddleware::class);
     })->add(AuthMiddleware::class);
 
     $app->group('', function (RouteCollectorProxy $guest) {
         $guest->get('/login', [AuthController::class, 'loginView']);
         $guest->get('/register', [AuthController::class, 'registerView']);
-        $guest->post('/login', [AuthController::class, 'loginView']);
-        $guest->post('/register', [AuthController::class, 'registerView']);
+        $guest->post('/login', [AuthController::class, 'logIn']);
+        $guest->post('/register', [AuthController::class, 'register']);
     })->add(GuestMiddleware::class);
 };
