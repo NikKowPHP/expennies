@@ -3,9 +3,9 @@
 namespace App\Controllers;
 
 use Slim\Views\Twig;
-use App\Contracts\AuthInterface;
 use App\Contracts\RequestValidatorFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class VerifyController
 {
@@ -15,6 +15,11 @@ class VerifyController
     ) {}
     public function index(ResponseInterface $response): ResponseInterface
     {
+        return $this->twig->render($response, "auth/verify.twig");
+    }
+    public function verify(ServerRequestInterface $request,ResponseInterface $response): ResponseInterface
+    {
+
         return $this->twig->render($response, "auth/verify.twig");
     }
 }
