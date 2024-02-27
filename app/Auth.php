@@ -8,6 +8,7 @@ use App\Contracts\UserInterface;
 use App\Contracts\SessionInterface;
 use App\DataObjects\RegisterUserData;
 use App\Contracts\UserProviderServiceInterface;
+use App\Enum\AuthAttemptStatus;
 
 class Auth implements AuthInterface
 {
@@ -34,13 +35,17 @@ class Auth implements AuthInterface
         $this->user = $user;
         return $this->user;
     }
-    public function attemptLogin(array $credentials): bool
+    public function attemptLogin(array $credentials): AuthAttemptStatus
     {
         $user = $this->userProvider->getByCredentials($credentials);
         if (!$user || !$this->checkCredentials($user, $credentials)) {
-            return false;
+            return AuthAttemptStatus::FAILED;
         }
-        return true;
+        if ($user->hasTwoFactorAuthEnabled()) {
+            return AuthAttemptStatus::TWO_FACTOR_AUTH;
+        }
+        $this->logIn($user);
+        return AuthAttemptStatus::SUCCESS;
     }
     public function logIn(UserInterface $user): void
     {
