@@ -142,4 +142,8 @@ class User implements UserInterface
     {
         $this->verifiedAt = $verifiedAt;
     }
+    public function hasTwoFactorAuthEnabled(): bool
+    {
+        return true;
+    }
 }
