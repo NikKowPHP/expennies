@@ -26,7 +26,7 @@ class UserLoginCode
     #[Column(name: 'is_active', options: ['default' => true])]
     private bool $isActive;
 
-    #[Column (name: 'expiration_date')]
+    #[Column (name: 'expiration')]
     private \DateTime $expiration;
 
     #[ManyToOne]
